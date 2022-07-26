@@ -1,4 +1,5 @@
-static const Operation operations[OP_SIZE] = {
+/*
+ * static const Operation operations[OP_SIZE] = {
         {0x0001, 0, "mov", {1, 1, 1, 1}, {0, 1, 1, 1}},
         {0x0002, 0, "cmp", {1, 1, 1, 1}, {1, 1, 1, 1}},
         {0x0004, 10, "add", {1, 1, 1, 1}, {0, 1, 1, 1}},
@@ -16,3 +17,4 @@ static const Operation operations[OP_SIZE] = {
         {0x4000, 0, "rts", {0, 0, 0, 0}, {0, 0, 0, 0}},
         {0x8000, 0, "stop", {0, 0, 0, 0}, {0, 0, 0, 0}},
 };
+ */

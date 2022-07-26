@@ -11,3 +11,4 @@
 int isCommentLine(char line_data[]);
 int isEmptyLine(char line_data[]);
 char* removeLeadingWhiteSpaces(char line_data[]);
+int startsWith(char* string, char* prefix);

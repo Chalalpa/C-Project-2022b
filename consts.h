@@ -6,6 +6,10 @@
 #define RAM_MEMORY_SIZE 256
 #define MAX_LABEL_LEN 30
 #define MAX_LINE_LEN 80
+#define MAX_LINES 100
+#define SOURCE_FILE_EXTENSION ".as"
+#define PRE_PROCESSING_FILE_EXTENSION ".am"
+
 
 /* Hash Table Hashsize (Result is currently 64)  */
 #define HASHSIZE ((RAM_MEMORY_SIZE / (MAX_LABEL_LEN + 1)) / 4)
@@ -44,8 +48,8 @@
 
 
 /* Macro */
-#define MACRO_START 'macro'
-#define MACRO_END 'endmacro'
+#define MACRO_START "macro"
+#define MACRO_END "endmacro"
 
 /* Sentences */
 #define NEWLINE_DELIMITER '\n'

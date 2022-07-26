@@ -6,16 +6,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <unistd.h>
 #include "common_utils.h"
 
 #define MACRO_START "macro"
 
 /* Defining a Macro linked list structure*/
 struct Macro {
-    char name[MAX_LINE_LEN];  // The macro name to be used later in the source code
-    char data[MAX_LINE_LEN];  // The macro content itself to deploy later in the code
+    char* name;  // The macro name to be used later in the source code
+    char* data;  // The macro content itself to deploy later in the code
     struct Macro* next;  // A pointer to the next Macro struct object
 };
 
-int run_preprocess(char file_path[], struct Macro * head);
-int contains_macro_start(char line_data[]);
+int readMacros(char* file_path, struct Macro* head);
+int writeMacros(char* file_path, struct Macro* head);

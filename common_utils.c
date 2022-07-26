@@ -4,23 +4,19 @@
 
 #include "common_utils.h"
 
+#define EMPTY_STRING = ''
 
-char* removeLeadingWhiteSpaces(char line_data[]) {
-    int i;
-    for (i=0; i < strlen(line_data); i++) {
-        if (!isspace(line_data[i]))
+
+char* removeLeadingWhiteSpaces(char* line_data) {
+    while (*line_data) {
+        if (!isspace(*line_data))
             break;
+        line_data++;
     }
-    if (i >= strlen(line_data))
-        return "";
-    char new_string[strlen(line_data) - i];
-    strncpy(new_string, &line_data[i], strlen(line_data) - i);
-    new_string[strlen(line_data) - i] = '\0';
-    char* new_string_p = new_string;
-    return new_string_p;
+    return line_data;
 }
 
-int isCommentLine(char line_data[]) {
+int isCommentLine(char* line_data) {
     char* trimmed_line = removeLeadingWhiteSpaces(line_data);
     if (*trimmed_line == ';')
         return 1;
@@ -28,9 +24,18 @@ int isCommentLine(char line_data[]) {
 }
 
 
-int isEmptyLine(char line_data[]) {
+int isEmptyLine(char* line_data) {
     char* trimmed_line = removeLeadingWhiteSpaces(line_data);
     if (*trimmed_line == '\0')
         return 1;
     return 0;
+}
+
+int startsWith(char* string, char* prefix)
+{
+    while(*prefix)
+        if(*prefix++ != *string++)
+            return 0;
+
+    return 1;
 }

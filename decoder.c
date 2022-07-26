@@ -1,6 +1,7 @@
+/*Returns the opcode type in decimal base*/
 #include <string.h>
-
-int opcode(char op[]) /*Returns the opcode type in decimal base*/
+/*
+int opcode(char op[])
 {
     switch (!strcmp(op, "mov"))
         return 0;
@@ -38,3 +39,4 @@ int opcode(char op[]) /*Returns the opcode type in decimal base*/
 
     return -1;
 }
+*/
