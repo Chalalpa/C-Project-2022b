@@ -11,20 +11,24 @@ int main(int argc, char *argv[])
     we are passing the command line arguments that are the files that passed to the assembler
     to the handleSourceFiles function.
      */
-    struct Macro* head = NULL;
-    head = (struct Macro*)malloc(sizeof(struct Macro));
-    head->name = EMPTY_MACRO_NAME;
-    head->next = NULL;
+    struct Macro* macroHead = NULL;
+    macroHead = (struct Macro*)malloc(sizeof(struct Macro));
+    macroHead->name = EMPTY_STRUCT_NAME;
+    macroHead->next = NULL;
 
     char* fileName;
     for (i = 0; i < argc; i++) {
         fileName = argv[i];
-        int readResult = readMacros(argv[i], head);
+        int readResult = readMacros(argv[i], macroHead);
         if (readResult) {
             // Only if there weren't errors reading the file
-            int writeResult = writeMacros(fileName, head);
+            int writeResult = writeMacros(fileName, macroHead);
             if (writeResult) {
-                firstRun(fileName);
+                struct Symbol* symbolHead = NULL;
+                symbolHead = (struct Symbol*)malloc(sizeof(struct Symbol));
+                symbolHead->name = EMPTY_STRUCT_NAME;
+                symbolHead->next = NULL;
+                firstRun(fileName, &IC, &DC, symbolHead);
             }
         }
     }

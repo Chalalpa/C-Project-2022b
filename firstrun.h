@@ -6,14 +6,16 @@
 #include <ctype.h>
 #include <unistd.h>
 #include "common_utils.h"
+#include "operations.h"
 
 
 struct Symbol {
-    char* name;  // The macro name to be used later in the source code
-    char* data;  // The macro content itself to deploy later in the code
-    struct Macro* next;  // A pointer to the next Macro struct object
+    char* name;  // The symbol name to be used later in the source code
+    char* value;  // The symbol value
+    char* type; // The symbol type
+    struct Symbol* next;  // A pointer to the next Symbol struct object
 };
 
 
-int firstRun(char* file_name);
+int firstRun(char* file_name, int* IC, int* DC, struct Symbol* head);
 

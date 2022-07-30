@@ -8,6 +8,20 @@
 #define EMPTY_STRING = ''
 
 
+int decimalToBinary(int decimal) // Maximum 15
+{
+    int binary = 0;
+    int rem, temp = 1;
+    while (decimal!=0)
+    {
+        rem = decimal%2;
+        decimal = decimal / 2;
+        binary = binary + rem*temp;
+        temp = temp * 10;
+    }
+    return binary;
+}
+
 char* removeLeadingWhiteSpaces(char* line_data) {
     while (*line_data) {
         if (!isspace(*line_data))
@@ -41,14 +55,45 @@ int startsWith(char* string, char* prefix)
     return 1;
 }
 
-int isKeyword(char* string) {
-    char **keywordsPointer = KEYWORDS;
-    while(*keywordsPointer) {
-        if(!strcmp(string, *keywordsPointer))
+int isStringInArray(char* string, char** arr) {
+    char** arrPointer = arr;
+    while(*arrPointer) {
+        if(!strcmp(string, *arrPointer))
             return 1;
-        keywordsPointer++;
+        arrPointer++;
     }
     return 0;
+}
+
+int isKeyword(char* string) {
+    return isStringInArray(string, KEYWORDS);
+}
+
+int isDataDirective(char* string) {
+    return isStringInArray(string, DATA_DIRECTIVES);
+}
+
+int isExternOrEntryDirective(char* string) {
+    return isStringInArray(string, EXTERN_OR_ENTRY);
+}
+
+int isDirective(char* string) {
+    return isDataDirective(string) || isExternOrEntryDirective(string);
+}
+
+int isOperation(char* string) {
+    return isStringInArray(string, OPERATIONS);
+}
+
+int getOperationIndex(char* operationName) {
+    char** operationsPointer = OPERATIONS;
+    int i=0;
+    while(*operationsPointer) {
+        if(!strcmp(operationName, *operationsPointer))
+            return i;
+        operationsPointer++;
+    }
+    return -1;
 }
 
 int isValidLabelOrMacroName(char* string, char* objectName) {
@@ -73,6 +118,7 @@ int isValidLabelOrMacroName(char* string, char* objectName) {
 
     if (isKeyword(string)) {
         printf("Error. %s's name is actually a keyword: %s\n", objectName, string);
+        return 0;
     }
     return 1;
 }

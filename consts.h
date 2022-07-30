@@ -16,10 +16,16 @@
 #define ENTRY ".entry"
 #define EXTERN ".extern"
 
+/* Symbols */
+#define CODE "code"
+#define DATA_DIRECTIVE "data"
+#define EXTERNAL_DIRECTIVE "external"
+
 /* Macro */
 #define MACRO_START "macro"
 #define MACRO_END "endmacro"
-#define EMPTY_MACRO_NAME "empty macro"
+
+#define EMPTY_STRUCT_NAME "!empty_struct!"
 
 /* Registers*/
 #define R0 "r0"
@@ -51,7 +57,11 @@
 #define RTS "rts"
 #define HLT "hlt"
 
+extern const char* DATA_DIRECTIVES[];
+extern const char* EXTERN_OR_ENTRY[];
+extern const char* OPERATIONS[];
 extern const char* KEYWORDS[];
+
 
 /* Hash Table Hashsize (Result is currently 64)  */
 #define HASHSIZE ((RAM_MEMORY_SIZE / (MAX_LABEL_LEN + 1)) / 4)
