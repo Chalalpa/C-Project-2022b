@@ -57,10 +57,15 @@
 #define RTS "rts"
 #define HLT "hlt"
 
+
+/* Decoding */
+#define TO_BE_FILLED "?"
+
 extern const char* DATA_DIRECTIVES[];
 extern const char* EXTERN_OR_ENTRY[];
 extern const char* OPERATIONS[];
 extern const char* KEYWORDS[];
+extern const char* REGISTERS[];
 
 
 /* Hash Table Hashsize (Result is currently 64)  */

@@ -4,22 +4,25 @@
 
 #include "common_utils.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #define EMPTY_STRING = ''
 
 
-int decimalToBinary(int decimal) // Maximum 15
+char* decToBinary(int n, int len)
 {
-    int binary = 0;
-    int rem, temp = 1;
-    while (decimal!=0)
-    {
-        rem = decimal%2;
-        decimal = decimal / 2;
-        binary = binary + rem*temp;
-        temp = temp * 10;
+    char* binaryNumber = (char*)calloc(8, sizeof(char));
+    char* binaryNumberPointer = binaryNumber;
+    // Size of an integer is assumed to be 8 bits
+    for (int i = len - 1; i >= 0; i--) {
+        int k = n >> i; // right shift
+        if (k & 1) // helps us know the state of first bit
+            *binaryNumberPointer = '1';
+        else
+            *binaryNumberPointer = '0';
+        binaryNumberPointer++;
     }
-    return binary;
+    return binaryNumber;
 }
 
 char* removeLeadingWhiteSpaces(char* line_data) {
@@ -29,6 +32,18 @@ char* removeLeadingWhiteSpaces(char* line_data) {
         line_data++;
     }
     return line_data;
+}
+
+char* removeEndingWhiteSpaces(char* line_data) {
+    int i = strlen(line_data) - 1;
+    char* lineDataPointer = line_data;
+    while (i > 0) {
+        if (!isspace(line_data[i]))
+            break;
+        i--;
+    }
+    lineDataPointer[i + 1] = '\0';
+    return lineDataPointer;
 }
 
 int isCommentLine(char* line_data) {
@@ -53,6 +68,16 @@ int startsWith(char* string, char* prefix)
             return 0;
 
     return 1;
+}
+
+int containsSpace(char* string) {
+    char* stringPointer = string;
+    while(*stringPointer) {
+        if (isspace(*stringPointer))
+            return 1;
+        stringPointer++;
+    }
+    return 0;
 }
 
 int isStringInArray(char* string, char** arr) {
@@ -91,6 +116,7 @@ int getOperationIndex(char* operationName) {
     while(*operationsPointer) {
         if(!strcmp(operationName, *operationsPointer))
             return i;
+        i++;
         operationsPointer++;
     }
     return -1;
@@ -123,6 +149,10 @@ int isValidLabelOrMacroName(char* string, char* objectName) {
     return 1;
 }
 
+int isRegister(char* string) {
+    return isStringInArray(string, REGISTERS);
+}
+
 int isValidMacro(char* string) {
     return isValidLabelOrMacroName(string, "macro");
 }
@@ -133,5 +163,25 @@ int isValidLabel(char* string) {
 
 
 int isLabel(char* string) {
+    return 0;
+}
+
+int isNumber(char* string) {
+    char* strPointer = string;
+    if (*strPointer == '-' || *strPointer == '+')
+        strPointer++;
+    while(*strPointer)
+        if(!isdigit(*strPointer))
+            return 0;
+    return 1;
+}
+
+int getIndexAddressing(char* string) {
+    char* strPointer = string;
+    strPointer += strlen(string) - 2;
+    if (!strcmp(strPointer, ".1"))
+        return 1;
+    if (!(strcmp(strPointer, ".2")))
+        return 2;
     return 0;
 }

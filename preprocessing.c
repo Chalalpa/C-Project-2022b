@@ -110,10 +110,11 @@ char* isMacroCall(char* line_data, struct Macro* head) {
         return 0;
 
     if (isspace(*leftTrimmedLine)) {
-        if (*removeLeadingWhiteSpaces(leftTrimmedLine) != "")
+        if (*removeLeadingWhiteSpaces(leftTrimmedLine) != 0) {
             // There shouldn't be found chars after a macro call
             printf("Error. Found trailing chars after calling a macro. Line data: %s\n", line_data);
-        return 0;
+            return 0;
+        }
     }
 
     *macroNamePointer = '\0';

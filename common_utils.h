@@ -6,6 +6,7 @@
 #include "consts.h"
 #include "ctype.h"
 #include <string.h>
+#include <unistd.h>
 
 
 int isCommentLine(char line_data[]);
@@ -20,3 +21,11 @@ int isDirective(char* string);
 int isOperation(char* string);
 int getOperationIndex(char* operationName);
 int decimalToBinary(int decimal);
+int isRegister(char* string);
+int isKeyword(char* string);
+int isNumber(char* string);
+int getIndexAddressing(char* string);
+char* decToBinary(int n, int len);
+char* removeEndingWhiteSpaces(char* line_data);
+int containsSpace(char* string);
+

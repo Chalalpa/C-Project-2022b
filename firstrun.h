@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "common_utils.h"
 #include "operations.h"
+#include "decodedline.h"
 
 
 struct Symbol {
@@ -17,5 +18,5 @@ struct Symbol {
 };
 
 
-int firstRun(char* file_name, int* IC, int* DC, struct Symbol* head);
+int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead);
 
