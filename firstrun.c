@@ -432,101 +432,76 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
 
 
 int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead) {
+    // Conduct full file path
     char* full_file_path = (char*)calloc(strlen(file_name) + strlen(PRE_PROCESSING_FILE_EXTENSION)
             ,sizeof(char));
     strcpy(full_file_path, file_name);
     strncat(full_file_path, PRE_PROCESSING_FILE_EXTENSION, strlen(PRE_PROCESSING_FILE_EXTENSION));
     FILE *file_pointer;
-    struct Symbol* tmp;
+
+    // Verifying file exists
     if (access(full_file_path, F_OK) != 0) {
         printf("No such file: '%s'\n", full_file_path);
         return 0;
     }
+
+    // Verifying file is reachable
     file_pointer = fopen(full_file_path, "r");
     if (file_pointer == NULL) {
         printf("Error reading given file '%s'\n", full_file_path);
         return 0;
     }
+
     char line_data[MAX_LINE_LEN + 1];
     memset(line_data, '\0', MAX_LINE_LEN + 1);
-    int i = 0;
+
+    // Iteration helper:
+    struct Symbol* tmpSymbol;
+    int i = 0, isLabel;
+
     while(fgets(line_data, MAX_LINE_LEN + 1, file_pointer)) {
-        if (strlen(line_data) > MAX_LINE_LEN)
+        // Handling general edge cases:
+        if (strlen(line_data) > MAX_LINE_LEN) {
             printf("Error! Line %d of file %s exceeds line length limit (%d)\n", i, full_file_path, MAX_LINE_LEN);
+            return 0;
+        }
+        if(isCommentLine(line_data) || isEmptyLine(line_data)) {
+            printf("Ignoring empty line number %d: %s\n", i, line_data);
+            continue;
+        }
+
+        isLabel = 0;
         char* labelName = getLabelName(line_data);
         if (labelName) {
-            if (doesLabelExist(labelName, symbolHead))
+            // If a valid label was found, turn on proper flag
+            isLabel = 1;
+            if (doesLabelExist(labelName, symbolHead)) {
                 printf("Error! Label with this name was already initialized earlier in the file: %s\n", line_data);
-            else {
-                tmp = NULL;
-                tmp = (struct Symbol*)malloc(sizeof(struct Symbol));
-                tmp->next = NULL;
-                tmp->name = (char*)calloc(strlen(labelName), sizeof(char));
-                strcpy(tmp->name, labelName);
-                char* labelFirstField = getLabelFirstField(line_data, labelName);
-                if (isDirective(labelFirstField)) {
-                    if (isDataDirective(labelFirstField)) {
-                        // Insert a data directive symbol
-                        tmp->type = (char*)calloc(strlen(DATA_DIRECTIVE), sizeof(char));
-                        tmp->type = DATA_DIRECTIVE;
-                        tmp->value = *IC;
-                        struct DecodedLine* decodedLine = decodeDataDirectiveLine(labelFirstField,
-                                line_data + strlen(labelName) + 1);
-                        if (decodedLine != 0) {
-                            *DC += decodedLine->length;
-                            decodedLineHead->next = decodedLine;
-                            decodedLineHead = decodedLine;
-                            *IC += decodedLine->length;
-                        }
-                        else {
-                            printf("Error! Couldn't decode line: %s\n", line_data);
-                            return 0;
-                        }
-                    } else if (isExternOrEntryDirective(labelFirstField)) {
-                        // Ignore label, it's meaningless in this case
-                        if(!strcmp(labelFirstField, EXTERN)) { // Check if it's an extern directive
-                            tmp = NULL;
-                            // Do what's .extern directive needs...
-                        }
-                        else {
-                            // Code for handling .entry directive...
-                        }
-                    }
-                }
-                else {
-                    tmp->type = (char*)calloc(strlen(CODE), sizeof(char));
-                    tmp->type = CODE;
-                    tmp->value = *IC;
-                    if (!isOperation(labelFirstField)) {
-                        printf("Error! '%s' is not a valid operation: %s\n", labelFirstField, line_data);
-                        return 0;
-                    }
-                    else {
-                        int operationIndex = getOperationIndex(labelFirstField);
-                        struct Operation operation = OPERATIONS_TABLE[operationIndex];
-                        struct DecodedLine* decodedLine = decodeOperationLine(operation, line_data);
-                        if (decodedLine != 0) {
-                            decodedLineHead->next = decodedLine;
-                            decodedLineHead = decodedLine;
-                            *IC += decodedLine->length;
-                            *DC += decodedLine->length;
-                        }
-                        else {
-                            printf("Error! Couldn't decode line: %s\n", line_data);
-                            return 0;
-                        }
-                    }
-                }
-                symbolHead->next = tmp;
-                symbolHead = tmp;
+                return 0;
             }
-        } else if (!isCommentLine(line_data) && !isEmptyLine(line_data)) {
-            char* labelFirstField = getLabelFirstField(line_data, "");
-            if (isOperation(labelFirstField)) {
-                int operationIndex = getOperationIndex(labelFirstField);
-                struct Operation operation = OPERATIONS_TABLE[operationIndex];
-                struct DecodedLine* decodedLine = decodeOperationLine(operation, line_data);
+        }
+        else
+            labelName = "";
+        // Initialize Symbol struct
+        tmpSymbol = NULL;
+        tmpSymbol = (struct Symbol*)malloc(sizeof(struct Symbol));
+        tmpSymbol->next = NULL;
+        tmpSymbol->name = (char*)calloc(strlen(labelName), sizeof(char));
+        strcpy(tmpSymbol->name, labelName);
+
+        char* labelFirstField = getLabelFirstField(line_data, labelName);
+        if (isDirective(labelFirstField)) {
+            // Handling directives
+            if (isDataDirective(labelFirstField)) {
+                // Handling data directives
+                tmpSymbol->type = (char*)calloc(strlen(DATA_DIRECTIVE), sizeof(char));
+                tmpSymbol->type = DATA_DIRECTIVE;
+                tmpSymbol->value = *IC;
+                struct DecodedLine* decodedLine = decodeDataDirectiveLine(labelFirstField,
+                        line_data + strlen(labelName) + 1);
                 if (decodedLine != 0) {
+                    // If line was encoded correctly, add it to decoded objects list
+                    *DC += decodedLine->length;
                     decodedLineHead->next = decodedLine;
                     decodedLineHead = decodedLine;
                     *IC += decodedLine->length;
@@ -535,7 +510,46 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
                     printf("Error! Couldn't decode line: %s\n", line_data);
                     return 0;
                 }
+
+            } else if (isExternOrEntryDirective(labelFirstField)) {
+                // Ignore label, it's meaningless in this case
+                if(!strcmp(labelFirstField, EXTERN)) { // Check if it's an extern directive
+                    tmpSymbol = NULL;
+                    // Do what's .extern directive needs...
+                }
+                else {
+                    // Code for handling .entry directive...
+                }
             }
+        }
+        else {
+            // Handling 'code' sentence
+            tmpSymbol->type = (char*)calloc(strlen(CODE), sizeof(char));
+            tmpSymbol->type = CODE;
+            tmpSymbol->value = *IC;
+            if (!isOperation(labelFirstField)) {.
+                printf("Error! '%s' is not a valid operation: %s\n", labelFirstField, line_data);
+                return 0;
+            }
+            else {
+                int operationIndex = getOperationIndex(labelFirstField);
+                struct Operation operation = OPERATIONS_TABLE[operationIndex];
+                struct DecodedLine* decodedLine = decodeOperationLine(operation, line_data);
+                if (decodedLine != 0) {
+                    decodedLineHead->next = decodedLine;
+                    decodedLineHead = decodedLine;
+                    *IC += decodedLine->length;
+                    *DC += decodedLine->length;
+                }
+                else {
+                    printf("Error! Couldn't decode line: %s\n", line_data);
+                    return 0;
+                }
+            }
+        }
+        if (isLabel) {
+            symbolHead->next = tmpSymbol;
+            symbolHead = tmpSymbol;
         }
         i++;
     }
