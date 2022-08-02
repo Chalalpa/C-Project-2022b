@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[])
 {
-    int IC = 0;  // Instruction counter
+    int IC = 100;  // Instruction counter
     int DC = 0;  // Data counter
     int i;
     /*
@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
     symbolHead->next = NULL;
     decodedLineHead = (struct DecodedLine*)malloc(sizeof(struct DecodedLine));
     decodedLineHead->isEmpty = 1;
+    decodedLineHead->length = 0;
     decodedLineHead->next = NULL;
 
     char* fileName;
@@ -33,7 +34,7 @@ int main(int argc, char *argv[])
             // Only if there weren't errors reading the file
             int writeResult = writeMacros(fileName, macroHead);
             if (writeResult) {
-                firstRun(fileName, &IC, &DC, symbolHead, decodedLineHead);
+                int flag = firstRun(fileName, &IC, &DC, symbolHead, decodedLineHead);
                 break;
             }
         }

@@ -22,6 +22,7 @@ char* decToBinary(int n, int len)
             *binaryNumberPointer = '0';
         binaryNumberPointer++;
     }
+    *binaryNumberPointer = '\0';
     return binaryNumber;
 }
 
@@ -171,8 +172,21 @@ int isNumber(char* string) {
     if (*strPointer == '-' || *strPointer == '+')
         strPointer++;
     while(*strPointer)
-        if(!isdigit(*strPointer))
+        if(!isdigit(*strPointer++))
             return 0;
+    return 1;
+}
+
+int isValidString(char* string) {
+    if (*string != '"')
+        return 0;
+    if (*(string + strlen(string) - 1) != '"')
+        return 0;
+    int i;
+    for (i=1; i < strlen(string) - 1; i++) {
+        if(string[i] == '"')
+            return 0;
+    }
     return 1;
 }
 

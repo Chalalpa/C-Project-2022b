@@ -28,4 +28,4 @@ int getIndexAddressing(char* string);
 char* decToBinary(int n, int len);
 char* removeEndingWhiteSpaces(char* line_data);
 int containsSpace(char* string);
-
+int isValidString(char* string);

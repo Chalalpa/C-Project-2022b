@@ -1,18 +1,17 @@
-hara
-macro m3
-dfdfds
-sdfsdfs
-endmacro
-m3
-macro mov
-dfdfds
-sdfsdfs
-endmacro
-m1
-jo3der: mov hara,r2
-jo4der: mov r3, r4
-jo5der: mov r5 ,r6
-jo6der: mov hara
-jo7der: mov hara.1,r2
-jo8der: cmp	hara.2,rr
-jo9der: add hara.3,rr
+MAIN: 	mov S1.1 ,LENGTH
+	add r2,STR
+LOOP:	jmp END
+	macro m1
+		inc	K
+		
+		mov S1.2 ,r3
+	endmacro
+		prn #-5
+	sub r1, r4
+			m1
+	bne LOOP
+	END:   hlt	
+STR: .string "abcdef"
+LENGTH:	.data 6, -9, 15
+K:	.data	22 
+S1:	.struct 8, "ab"

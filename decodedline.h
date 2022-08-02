@@ -2,7 +2,8 @@
 
 
 struct DecodedLine {
-    char** binaryValue;  // There is a maximum of 5 lines per command
+    char** binaryValue;
+    int length;
     char* srcOperandName;
     char* tgtOperandName;
     int isEmpty;
