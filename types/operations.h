@@ -1,5 +1,5 @@
-#ifndef OPERATIONS
-#define OPERATIONS
+#ifndef _OPERATIONS_
+#define _OPERATIONS_
 #include <string.h>
 #include "../helpers/consts.h"
 

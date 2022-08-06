@@ -1,5 +1,5 @@
-#ifndef COMMON_UTILS
-#define COMMON_UTILS
+#ifndef _COMMON_UTILS_
+#define _COMMON_UTILS_
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -7,6 +7,7 @@
 #include <string.h>
 #include "ctype.h"
 #include "consts.h"
+#include <math.h>
 
 
 /* @ Function: int isCommentLine(char* line_data)
@@ -165,5 +166,12 @@ char* getLabelName(char* line_data);
    It returns 0 if no field was found.
 */
 char* getNextField(char* line_data);
+
+/* @ Function: char* binToSpecialB32(char* n)
+   @ Arguments: char* n
+   n - the number wished to be translated to special 32 base
+   @ Description: The function calculates and returns the given binary number in a 32 special base.
+*/
+char* binToSpecialB32(char* n);
 
 #endif

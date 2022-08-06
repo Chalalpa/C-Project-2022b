@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     entryHead->name = EMPTY_STRUCT_NAME;
     entryHead->next = NULL;
 
-    externHead = (struct Entry*)malloc(sizeof(struct Entry));
+    externHead = (struct Extern*)malloc(sizeof(struct Extern));
     externHead->name = EMPTY_STRUCT_NAME;
     externHead->next = NULL;
 

@@ -1,5 +1,5 @@
-#ifndef CONSTS
-#define CONSTS
+#ifndef _CONSTS_
+#define _CONSTS_
 
 #define BINARY_WORD_SIZE 10
 #define MEMORY_START 100
@@ -11,6 +11,9 @@
 #define SOURCE_FILE_EXTENSION ".as"
 #define PRE_PROCESSING_FILE_EXTENSION ".am"
 #define OBJECT_FILE_EXTENSION ".ob"
+#define ENTRIES_FILE_EXTENSION ".ent"
+#define EXTERNS_FILE_EXTENSION ".ext"
+
 
 /* Directives */
 #define DATA ".data"
@@ -69,5 +72,8 @@ extern const char* EXTERN_OR_ENTRY[];
 extern const char* OPERATIONS[];
 extern const char* KEYWORDS[];
 extern const char* REGISTERS[];
+
+/* Special 32 base */
+extern const char SPECIAL_BASE32[32];
 
 #endif

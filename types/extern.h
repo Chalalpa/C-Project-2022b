@@ -1,5 +1,5 @@
-#ifndef EXTERN
-#define EXTERN
+#ifndef _EXTERN_
+#define _EXTERN_
 
 struct Extern {
     char* name;

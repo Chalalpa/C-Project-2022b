@@ -1,5 +1,5 @@
-#ifndef DIRECTIVES
-#define DIRECTIVES
+#ifndef _DIRECTIVES_
+#define _DIRECTIVES_
 
 #include <string.h>
 #include "../helpers/consts.h"

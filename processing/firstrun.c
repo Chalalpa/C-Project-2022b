@@ -68,11 +68,11 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
     decoded->srcOperandName = NULL;
     decoded->tgtOperandName = NULL;
     struct Directive directive = *directivePointer;
-    decoded->binaryValue = (char**)calloc(directive.maxOperandsNum, (BINARY_WORD_SIZE + 1) * sizeof(char));
     char* trimmedLine = removeEndingWhiteSpaces(removeLeadingWhiteSpaces(line_data));
     trimmedLine += strlen(directiveName);
     trimmedLine = removeEndingWhiteSpaces(removeLeadingWhiteSpaces(trimmedLine));
     if (!strcmp(directiveName, DATA)) {  // .data directive
+        decoded->binaryValue = (char**)calloc(directive.maxOperandsNum, (BINARY_WORD_SIZE + 1) * sizeof(char));
         char** operands = getOperands(trimmedLine, directive.maxOperandsNum);
         int operandsCount = 0;
         while(operands[operandsCount]) {
@@ -95,7 +95,7 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
         return decoded;
     }
     if (!strcmp(directiveName, STRING)) {
-
+        decoded->binaryValue = (char**)calloc(strlen(trimmedLine) - 1, (BINARY_WORD_SIZE + 1) * sizeof(char));
         if(!isValidString(trimmedLine)) {
             printf("Error! found an invalid string under %s data directive declaration: %s\n", STRING, line_data);
             return 0;
@@ -117,8 +117,8 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
                    line_data);
             return 0;
         }
-        decoded->binaryValue[0] = (char *) calloc(BINARY_WORD_SIZE + 1, sizeof(char));
-        strcpy(decoded->binaryValue[0], decToBinary(atoi(operands[0]), 10));
+        char* firstWord = (char *) calloc(BINARY_WORD_SIZE + 1, sizeof(char));
+        strcpy(firstWord, decToBinary(atoi(operands[0]), 10));
         trimmedLine += strlen(operands[0]);
         trimmedLine = removeLeadingWhiteSpaces(trimmedLine);
         if (*trimmedLine != ',') {
@@ -137,17 +137,21 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
             printf("Error! Struct's second field must be a valid string: %s\n", line_data);
             return 0;
         }
-        trimmedLine++;  // Skip the '"'
+        trimmedLine++;
+        decoded->length = strlen(string);
+        decoded->binaryValue = (char**)calloc(decoded->length, (BINARY_WORD_SIZE + 1) * sizeof(char));
+        decoded->binaryValue[0] = (char *) calloc(BINARY_WORD_SIZE + 1, sizeof(char));
+        strcpy(decoded->binaryValue[0], firstWord);
+        // Skip the '"'
         int i;
-        for (i = 0; i < strlen(string) - 1; i++) {
-            decoded->binaryValue[i + 1] = (char *) calloc(BINARY_WORD_SIZE + 1,
+        for (i = 1; i < strlen(string) - 1; i++) {
+            decoded->binaryValue[i] = (char *) calloc(BINARY_WORD_SIZE + 1,
                                                           sizeof(char));
-            strcpy(decoded->binaryValue[i + 1], decToBinary((int) (string[i]), 10));
+            strcpy(decoded->binaryValue[i], decToBinary((int) (string[i]), 10));
         }
-        decoded->binaryValue[i + 1] = (char *) calloc(BINARY_WORD_SIZE + 1,
+        decoded->binaryValue[i] = (char *) calloc(BINARY_WORD_SIZE + 1,
                                                       sizeof(char));
-        strcpy(decoded->binaryValue[i + 1], decToBinary((int)(0), 10));
-        decoded->length = i + 1;
+        strcpy(decoded->binaryValue[i], decToBinary((int)(0), 10));
         trimmedLine += strlen(string) - 1;  // Skip the string and the '"' char at the end
         if(*trimmedLine) {
             printf("Error! Found trailing spaces after struct declaration: %s\n", line_data);
@@ -303,24 +307,24 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
             char* binaryRegisterNumber = decToBinary(registerNumber, 4);
             if(sourceOperand) {
                 decoded->binaryValue[1] = (char*)calloc(BINARY_WORD_SIZE, sizeof(char));
-                strcpy(decoded->binaryValue[1], "0000");
-                strcat(decoded->binaryValue[1], binaryRegisterNumber);
+                strcpy(decoded->binaryValue[1], binaryRegisterNumber);
+                strcat(decoded->binaryValue[1], "0000");
                 strcat(decoded->binaryValue[1], "00");
             }
             else {
                 if (operandsCount > 1 && (isRegister(operands[i-1]))) {
-                    decoded->binaryValue[1] = (char*)calloc(BINARY_WORD_SIZE, sizeof(char));
-                    strcpy(decoded->binaryValue[1], binaryRegisterNumber);
                     char* srcRegisterCode = (char*)calloc(4, sizeof(char));
                     strncpy(srcRegisterCode, decoded->binaryValue[1] + 4, 4);
                     srcRegisterCode[4] = '\0';
-                    strcat(decoded->binaryValue[1], srcRegisterCode);
+                    decoded->binaryValue[1] = (char*)calloc(BINARY_WORD_SIZE, sizeof(char));
+                    strcpy(decoded->binaryValue[1], srcRegisterCode);
+                    strcat(decoded->binaryValue[1], binaryRegisterNumber);
                     strcat(decoded->binaryValue[1], "00");
                 }
                 else {
                     decoded->binaryValue[3] = (char*)calloc(BINARY_WORD_SIZE, sizeof(char));
-                    strcpy(decoded->binaryValue[3], binaryRegisterNumber);
-                    strcat(decoded->binaryValue[3], "0000");
+                    strcpy(decoded->binaryValue[3], "0000");
+                    strcat(decoded->binaryValue[3], binaryRegisterNumber);
                     strcat(decoded->binaryValue[3], "00");
                 }
             }
@@ -433,11 +437,12 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
     while(fgets(line_data, MAX_LINE_LEN + 1, file_pointer)) {
         // Handling general edge cases:
         if (strlen(line_data) > MAX_LINE_LEN) {
-            printf("Error! Line %d of file %s exceeds line length limit (%d)\n", i, full_file_path, MAX_LINE_LEN);
+            printf("Error! Line %d of file %s exceeds line length limit (%d)\n",
+                   i + 1, full_file_path, MAX_LINE_LEN);
             return 0;
         }
         if(isCommentLine(line_data) || isEmptyLine(line_data)) {
-            printf("Ignoring empty line number %d: %s\n", i, line_data);
+            printf("Ignoring empty line number %d: %s\n", i + 1, line_data);
             continue;
         }
 
@@ -474,13 +479,14 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
                         line_data + strlen(labelName) + 1);
                 if (decodedLine != 0) {
                     // If line was encoded correctly, add it to decoded objects list
+                    decodedLine->value = *IC;
                     *DC += decodedLine->length;
                     decodedLineHead->next = decodedLine;
                     decodedLineHead = decodedLine;
                     *IC += decodedLine->length;
                 }
                 else {
-                    printf("Error! Couldn't decode line number %d: %s\n", i, line_data);
+                    printf("Error! Couldn't decode line number %d: %s\n", i + 1, line_data);
                     return 0;
                 }
 
@@ -491,18 +497,21 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
                         line_data + strlen(labelName) + strlen(labelFirstField));
                 if (name == 0) {
                     printf("Error! There must be a name attached to %s directives in line %d: %s\n",
-                           labelFirstField, i, line_data);
+                           labelFirstField, i + 1, line_data);
                     return 0;
                 }
                 if(!isValidLabel(name)) {
                     printf("Error! Found %s declaration for an invalid label in line %d: %s\n",
-                           labelFirstField, i, line_data);
+                           labelFirstField, i + 1, line_data);
                     return 0;
                 }
-                char* trailingChars = getNextField(line_data + strlen(labelName) +
-                                                         strlen(labelFirstField) + strlen(name));
-                if (trailingChars) {
-                    printf("Error! Found trailing chars after entry declaration in line %d: %s\n", i,
+                char* trailingChars = removeLeadingWhiteSpaces(line_data);
+                trailingChars += strlen(labelFirstField);
+                trailingChars = removeLeadingWhiteSpaces(trailingChars);
+                trailingChars += strlen(name);
+                trailingChars = getNextField(trailingChars);
+                if (trailingChars != 0) {
+                    printf("Error! Found trailing chars after entry declaration in line %d: %s\n", i + 1,
                            line_data);
                     return 0;
                 }
@@ -525,6 +534,7 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
                     struct Entry* entryTmp = (struct Entry*)malloc(sizeof(struct Entry));
                     entryTmp->next = NULL;
                     entryTmp->name = (char*)calloc(strlen(name), sizeof(char));
+                    entryTmp->lineNum = i + 1;
                     strcpy(entryTmp->name, name);
                     entryHead->next = entryTmp;
                     entryHead = entryTmp;
@@ -537,7 +547,7 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
             tmpSymbol->type = CODE;
             tmpSymbol->value = *IC;
             if (!isOperation(labelFirstField)) {
-                printf("Error! '%s' is not a valid operation in line %d: %s\n", i, labelFirstField, line_data);
+                printf("Error! '%s' is not a valid operation in line %d: %s\n", i + 1, labelFirstField, line_data);
                 return 0;
             }
             else {
@@ -545,14 +555,15 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
                 struct Operation operation = OPERATIONS_TABLE[operationIndex];
                 struct DecodedLine* decodedLine = decodeOperationLine(operation, line_data);
                 if (decodedLine != 0) {
-                    decodedLine->lineNum = i;
+                    decodedLine->value = *IC;
+                    decodedLine->lineNum = i + 1;
                     decodedLineHead->next = decodedLine;
                     decodedLineHead = decodedLine;
                     *IC += decodedLine->length;
                     *DC += decodedLine->length;
                 }
                 else {
-                    printf("Error! Couldn't decode line number %d: %s\n", i, line_data);
+                    printf("Error! Couldn't decode line number %d: %s\n", i + 1, line_data);
                     return 0;
                 }
             }

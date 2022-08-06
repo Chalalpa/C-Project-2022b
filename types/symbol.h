@@ -1,5 +1,5 @@
-#ifndef SYMBOL
-#define SYMBOL
+#ifndef _SYMBOL_
+#define _SYMBOL_
 
 struct Symbol {
     char* name;  // The symbol name to be used later in the source code

@@ -1,3 +1,5 @@
+#ifndef _PRE_PROCESSING_
+#define _PRE_PROCESSING_
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,3 +34,5 @@ int readMacros(char* file_path, struct Macro* head);
    It returns 1 if there were no errors writing the file, and 0 if there were errors writing it.
 */
 int writeMacros(char* file_path, struct Macro* head);
+
+#endif

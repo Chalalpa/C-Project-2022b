@@ -9,9 +9,9 @@
 */
 char* decToBinary(int n, int len)
 {
-    char* binaryNumber = (char*)calloc(8, sizeof(char));
+    char* binaryNumber = (char*)calloc(len, sizeof(char));
     char* binaryNumberPointer = binaryNumber;
-    // Size of an integer is assumed to be 8 bits
+    // Size of an integer is assumed to be <len> bits
     for (int i = len - 1; i >= 0; i--) {
         int k = n >> i; // right shift
         if (k & 1) // helps us know the state of first bit
@@ -22,6 +22,69 @@ char* decToBinary(int n, int len)
     }
     *binaryNumberPointer = '\0';
     return binaryNumber;
+}
+
+/* @ Function: char* binToDec(char* n)
+   @ Arguments: char* n
+   n - the number wished to be translated to decimal
+   @ Description: The function calculates and returns the given binary number in a decimal base.
+*/
+char* binToDec(char* n) {
+    int num = 0;
+    double i = 0.0;
+    char* numPointer = n + strlen(n) - 1;
+    while(i < strlen(n)) {
+        if (*numPointer == '0' || *numPointer == '1') {
+            if (*numPointer == '1') {
+                num += pow(2.0, i);
+            }
+        }
+        else {
+            return 0;
+        }
+        numPointer--;
+        i+=1.0;
+    }
+    return num;
+}
+
+/* @ Function: char* binToSpecialB32(char* n)
+   @ Arguments: char* n
+   n - the number wished to be translated to special 32 base
+   @ Description: The function calculates and returns the given binary number in a 32 special base.
+*/
+char* binToSpecialB32(char* n)
+{
+    int decimal = binToDec(n);
+    char* b32 = (char*)calloc(8, sizeof(char));
+    char* b32Pointer = b32;
+    do
+    {
+        int d = decimal % 32 ;
+        *b32Pointer = SPECIAL_BASE32[d];
+        decimal /= 32 ;
+        b32Pointer++;
+
+    } while(decimal > 0);
+    while (strlen(b32) < 2)
+        *b32Pointer++ = SPECIAL_BASE32[0];
+    b32 = strrev(b32);
+    /*
+    char* specialB32 = (char*)calloc(8, sizeof(char));
+    char* specialB32Pointer = specialB32;
+    while (*b32Pointer) {
+        int i = 0;
+        *specialB32Pointer = *b32Pointer;
+        while (!isdigit(*specialB32Pointer)) {
+            *specialB32Pointer -= 'a';
+            i++;
+        }
+        *specialB32Pointer = SPECIAL_BASE32[*specialB32Pointer - '0' + (i * 10)];
+        b32Pointer++;
+        specialB32Pointer++;
+    }
+    */
+    return b32;
 }
 
 /* @ Function: char* removeLeadingWhiteSpaces(char* line_data)
@@ -121,7 +184,7 @@ int containsSpace(char* string) {
 */
 int isStringInArray(char* string, char** arr) {
     char** arrPointer = arr;
-    while(*arrPointer) {
+    while(*arrPointer && **arrPointer) {
         if(!strcmp(string, *arrPointer))
             return 1;
         arrPointer++;
@@ -346,5 +409,7 @@ char* getNextField(char* line_data) {
         fieldNamePointer++;
         lineDataPointer++;
     }
+    if (isEmptyLine(fieldName))
+        return 0;
     return fieldName;
 }

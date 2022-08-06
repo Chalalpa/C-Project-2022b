@@ -1,3 +1,5 @@
+#ifndef _FIRST_RUN_
+#define _FIRST_RUN_
 #include <ctype.h>
 #include <unistd.h>
 #include "../helpers/consts.h"
@@ -28,3 +30,5 @@
 */
 int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead,
              struct Entry* entryHead, struct Extern* externHead);
+
+#endif
