@@ -1,20 +1,5 @@
 #include "main.h"
 
-/*int freeMacros(struct Macro* macroHead) {
-    struct Macro* headPointer = macroHead;
-    struct Macro* nextPointer = macroHead->next;
-    do {
-        free(headPointer);
-        headPointer = nextPointer;
-        if (headPointer != NULL)
-            nextPointer = headPointer->next;
-    }
-    while (headPointer != NULL);
-    return 1;
-}
-*/
-
-
 int main(int argc, char *argv[])
 {
     int IC = MEMORY_START;  // Instruction counter
