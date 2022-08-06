@@ -1,5 +1,6 @@
 #include "consts.h"
 
+/* A constants file, to store all kinds of constants that might be re-used in the project */
 
 const char* DATA_DIRECTIVES[] = {DATA, STRING, STRUCT, "\0"};
 const char* EXTERN_OR_ENTRY[] = {EXTERN, ENTRY, "\0"};

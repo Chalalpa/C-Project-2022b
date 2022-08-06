@@ -3,15 +3,15 @@
 #include <string.h>
 #include "../helpers/consts.h"
 
-
-struct AddressingMethodsConfig
-{
+/* A struct to represent the possible addressing methods and the possible configs per operation*/
+struct AddressingMethodsConfig {
     int immediate; // 0 -> 00
     int direct;  // 1 -> 01
     int index;  // 2 -> 10
     int reg;  // 3 -> 11
 };
 
+/* A struct to represent each of the supported operations and their properties*/
 struct Operation {
     char* name;
     int opCode;  // 0 to 15, decimal
@@ -22,6 +22,7 @@ struct Operation {
 };
 
 
+/* A static const list to represent the possible operations that are supported and each with its configuration*/
 static const struct Operation OPERATIONS_TABLE[OP_SIZE] = {
         {MOV, 0, "0000", 2, {1, 1, 1, 1}, {0, 1, 1, 1}},
         {CMP, 1, "0001", 2, {1, 1, 1, 1}, {1, 1, 1, 1}},
@@ -41,6 +42,12 @@ static const struct Operation OPERATIONS_TABLE[OP_SIZE] = {
         {HLT, 15, "1111", 0, {0, 0, 0, 0}, {0, 0, 0, 0}}
 };
 
+/* @ Function: int getOperationIndex(char* operationName);
+   @ Arguments: char* operationName
+   operationName - is the requested operation name
+   @ Description: The function goes through the operations array, and finds the requested operation index by its name.
+   It returns is if it finds it, but if not, it returns -1.
+*/
 int getOperationIndex(char* operationName);
 
 #endif

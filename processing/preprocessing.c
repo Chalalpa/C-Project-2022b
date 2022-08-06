@@ -103,8 +103,9 @@ char* isMacroCall(char* line_data, struct Macro* head) {
         tmp = tmp->next;
     }
 
-    if (!macroExists)
+    if (!macroExists) {
         return 0;
+    }
 
     if (isspace(*leftTrimmedLine)) {
         if (*removeLeadingWhiteSpaces(leftTrimmedLine) != 0) {
@@ -154,17 +155,19 @@ int writeMacroContent(char* macroName, FILE* file_writer_pointer, struct Macro* 
    It returns 1 if there were no errors reading the file, and 0 if there were errors reading it.
 */
 int readMacros(char* file_name, struct Macro* head) {
-    char* full_file_path = (char*)malloc(strlen(file_name) + strlen(SOURCE_FILE_EXTENSION));
+    char* full_file_path = (char*)malloc(strlen(file_name) + strlen(SOURCE_FILE_EXTENSION) + 1);
     strcpy(full_file_path, file_name);
     strncat(full_file_path, SOURCE_FILE_EXTENSION, strlen(SOURCE_FILE_EXTENSION));
     FILE *file_pointer;
     if (access(full_file_path, F_OK) != 0) {
         printf("No such file: '%s'\n", full_file_path);
+        free(full_file_path);
         return 0;
     }
     file_pointer = fopen(full_file_path, "r");
     if (file_pointer == NULL) {
         printf("Error reading given file '%s'\n", full_file_path);
+        free(full_file_path);
         return 0;
     }
     char line_data[MAX_LINE_LEN + 1];
@@ -172,12 +175,13 @@ int readMacros(char* file_name, struct Macro* head) {
     int i = 0;
     int foundMacro = 0;
     struct Macro *tmp;
+    char* macroName;
     while(fgets(line_data, MAX_LINE_LEN + 1, file_pointer)) {
         if (strlen(line_data) > MAX_LINE_LEN)
             printf("Error! Line %d of file %s exceeds line length limit (%d)\n", i, full_file_path, MAX_LINE_LEN);
         else {
             if (isMacroStart(line_data)) {
-                char* macroName = parseMacroName(line_data);
+                macroName = parseMacroName(line_data);
                 if (macroName) {
                     foundMacro = 1;
                     tmp = NULL;
@@ -202,8 +206,9 @@ int readMacros(char* file_name, struct Macro* head) {
         }
         i++;
     }
-    //free(full_file_path);
     fclose(file_pointer);
+    free(macroName);
+    free(full_file_path);
     return 1;
 }
 
@@ -217,10 +222,10 @@ int readMacros(char* file_name, struct Macro* head) {
    It returns 1 if there were no errors writing the file, and 0 if there were errors writing it.
 */
 int writeMacros(char* file_name, struct Macro* head) {
-    char* full_file_path = (char*)malloc(strlen(file_name) + strlen(SOURCE_FILE_EXTENSION));
+    char* full_file_path = (char*)calloc(strlen(file_name) + strlen(SOURCE_FILE_EXTENSION) + 1, sizeof(char));
     strcpy(full_file_path, file_name);
     strncat(full_file_path, SOURCE_FILE_EXTENSION, strlen(SOURCE_FILE_EXTENSION));
-    char* new_file_path = (char*)malloc(strlen(file_name) + strlen(PRE_PROCESSING_FILE_EXTENSION));
+    char* new_file_path = (char*)calloc(strlen(file_name) + strlen(PRE_PROCESSING_FILE_EXTENSION) + 1, sizeof(char));
     strcpy(new_file_path, file_name);
     strncat(new_file_path, PRE_PROCESSING_FILE_EXTENSION, strlen(PRE_PROCESSING_FILE_EXTENSION));
     int foundMacro = 0;
@@ -231,6 +236,8 @@ int writeMacros(char* file_name, struct Macro* head) {
     file_reader_pointer = fopen(full_file_path,"r");
     if (file_reader_pointer == NULL) {
         printf("Error reading given file '%s'. Cannot write '.am' file\n", full_file_path);
+        free(full_file_path);
+        free(new_file_path);
         return 0;
     }
     file_writer_pointer = fopen(new_file_path,"w");
@@ -256,9 +263,9 @@ int writeMacros(char* file_name, struct Macro* head) {
                     foundMacro = 0;
         i++;
     }
-    //free(full_file_path);
-    //free(new_file_path);
     fclose(file_reader_pointer);
     fclose(file_writer_pointer);
+    free(full_file_path);
+    free(new_file_path);
     return 1;
 }

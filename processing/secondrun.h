@@ -15,7 +15,19 @@
 #include "../types/symbol.h"
 
 
-int secondRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead,
+/* @ Function: int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead,
+                             struct Entry* entryHead, struct Extern* externHead);
+   @ Arguments: char* file_name, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead,
+                struct Entry* entryHead, struct Extern* externHead
+   file_name is the path that we should read from, without its extension
+   symbolHead, that represents head of Symbol linked list.
+   decodedLineHead, that represents head of DecodedLine linked list.
+   entryHead, that represents head of Entry linked list.
+   externHead, that represents head of Extern linked list.
+   @ Description: The function goes through the requested file, writes the translation of it to machine code in a unique
+   32' base, and writes .ext and .ent files accordingly.
+*/
+int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead,
               struct Entry* entryHead, struct Extern* externHead);
 
 #endif

@@ -9,6 +9,7 @@
 #include "consts.h"
 #include <math.h>
 
+/* A common utils file, to store all kinds of abilities that might be re-used in the project */
 
 /* @ Function: int isCommentLine(char* line_data)
    @ Arguments: char* line_data

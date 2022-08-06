@@ -82,6 +82,7 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
             }
             else {
                 printf("Error! Found a non-number operand for %s data directive: %s\n", DATA, line_data);
+                free(operands);
                 return 0;
             }
             operandsCount++;
@@ -89,9 +90,11 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
         if (directive.minOperandsNum > operandsCount || directive.maxOperandsNum < operandsCount) {
             printf("Error! operands count num is less than minimum %d or more than maximum %d: %s\n",
                    directive.minOperandsNum, directive.maxOperandsNum, line_data);
+            free(operands);
             return 0;
         }
         decoded->length = operandsCount;
+        free(operands);
         return decoded;
     }
     if (!strcmp(directiveName, STRING)) {
@@ -115,6 +118,7 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
         if (!isValidNumber(operands[0])) {
             printf("Error! first operand of %s data directive must be valid string/number: %s\n", STRUCT,
                    line_data);
+            free(operands);
             return 0;
         }
         char* firstWord = (char *) calloc(BINARY_WORD_SIZE + 1, sizeof(char));
@@ -123,11 +127,13 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
         trimmedLine = removeLeadingWhiteSpaces(trimmedLine);
         if (*trimmedLine != ',') {
             printf("Error! Expected ',' after first struct's field declaration: %s\n", line_data);
+            free(operands);
             return 0;
         }
         trimmedLine = removeLeadingWhiteSpaces(trimmedLine + 1);
         if (*trimmedLine != '"') {
             printf("Error! Expected start of string declaration as struct's second field: %s\n", line_data);
+            free(operands);
             return 0;
         }
         char *string = (char *)calloc(strlen(trimmedLine), sizeof(char));
@@ -135,6 +141,7 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
         string[strlen(trimmedLine)] = '\0';
         if (!isValidString(string)) {
             printf("Error! Struct's second field must be a valid string: %s\n", line_data);
+            free(operands);
             return 0;
         }
         trimmedLine++;
@@ -155,8 +162,10 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
         trimmedLine += strlen(string) - 1;  // Skip the string and the '"' char at the end
         if(*trimmedLine) {
             printf("Error! Found trailing spaces after struct declaration: %s\n", line_data);
+            free(operands);
             return 0;
         }
+        free(operands);
         return decoded;
     }
     printf("Error! No valid directive was found under the name of %s: %s\n", directiveName, line_data);
@@ -210,6 +219,7 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
         if (operands[i] != 0) {
             if(containsSpace(operands[i])) {
                 printf("Error! Found whitespace in an operand: %s\n", line_data);
+                free(operands);
                 return 0;
             }
             operandsCount++;
@@ -218,6 +228,7 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
     if (operandsCount != operation.operandsNum) {
         printf("Error! expected %d operands for operation %s, found more: %s\n", operation.operandsNum,
                operation.name, line_data);
+        free(operands);
         return 0;
     }
     for (i=0; i<operandsCount; i++)
@@ -238,6 +249,7 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
             decoded->binaryValue[i] = NULL;
         // Finished decoding the line
         decoded->length = 1;
+        free(operands);
         return decoded;
     }
     if (operandsCount == 1) {
@@ -263,6 +275,7 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
         if (startsWith(operands[i], "#")) {
             if (!isValidNumber(operands[i] + 1)) {
                 printf("Error! Expected a number after '#' sign: %s\n", line_data);
+                free(operands);
                 return 0;
             }
             else {
@@ -270,12 +283,14 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
                     if (!operation.sourceAddressingMethods.immediate) {  // 00
                         printf("Error! operation %s does not support direct addressing from source: %s\n",
                                operation.name, line_data);
+                        free(operands);
                         return 0;
                     }
                 } else {
                     if (!operation.targetAddressingMethods.immediate) {
                         printf("Error! operation %s does not support direct addressing to target: %s\n", operation.name,
                                line_data);
+                        free(operands);
                         return 0;
                     }
 
@@ -296,11 +311,13 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
                 if (!operation.sourceAddressingMethods.reg) {  // 11
                     printf("Error! operation %s does not support reg addressing from source: %s\n",
                            operation.name, line_data);
+                    free(operands);
                     return 0;
                 }
             } else if (!operation.targetAddressingMethods.reg) {
                 printf("Error! operation %s does not support reg addressing to target: %s\n", operation.name,
                        line_data);
+                free(operands);
                 return 0;
             }
             int registerNumber = atoi(operands[i] + 1);
@@ -314,7 +331,7 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
             else {
                 if (operandsCount > 1 && (isRegister(operands[i-1]))) {
                     char* srcRegisterCode = (char*)calloc(4, sizeof(char));
-                    strncpy(srcRegisterCode, decoded->binaryValue[1] + 4, 4);
+                    strncpy(srcRegisterCode, decoded->binaryValue[1], 4);
                     srcRegisterCode[4] = '\0';
                     decoded->binaryValue[1] = (char*)calloc(BINARY_WORD_SIZE, sizeof(char));
                     strcpy(decoded->binaryValue[1], srcRegisterCode);
@@ -336,17 +353,20 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
             labelName[strlen(operands[i])- strlen(".1")] = '\0';
             if (!isValidLabel(labelName)) {
                 printf("Error! tried to access an invalid label's property: %s\n", line_data);
+                free(operands);
                 return 0;
             }
             if (sourceOperand) {
                 if (!operation.sourceAddressingMethods.index) {  // 10
                     printf("Error! operation %s does not support index addressing from source: %s\n",
                            operation.name, line_data);
+                    free(operands);
                     return 0;
                 }
             } else if (!operation.targetAddressingMethods.index) {
                 printf("Error! operation %s does not support index addressing to target: %s\n", operation.name,
                        line_data);
+                free(operands);
                 return 0;
             }
             int binaryNumberLineIndex;
@@ -366,11 +386,13 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
                 if (!operation.sourceAddressingMethods.direct) {  // 01
                     printf("Error! operation %s does not support direct addressing from source: %s\n",
                            operation.name, line_data);
+                    free(operands);
                     return 0;
                 }
             } else if (!operation.targetAddressingMethods.direct) {
                 printf("Error! operation %s does not support direct addressing to target: %s\n", operation.name,
                        line_data);
+                free(operands);
                 return 0;
             }
             int binaryNumberLineIndex;
@@ -387,6 +409,7 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
     decoded->binaryValue[0][BINARY_WORD_SIZE - 2] = '0';
     decoded->binaryValue[0][BINARY_WORD_SIZE - 1] = '0';
     decoded->length = getDecodedLineLength(decoded);
+    free(operands);
     return decoded;
 }
 

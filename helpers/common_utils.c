@@ -1,5 +1,6 @@
 #include "common_utils.h"
 
+/* A common utils file, to store all kinds of abilities that might be re-used in the project */
 
 /* @ Function: char* decToBinary(int n, int len)
    @ Arguments: int n, int len

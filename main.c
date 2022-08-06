@@ -1,15 +1,25 @@
 #include "main.h"
 
+/*int freeMacros(struct Macro* macroHead) {
+    struct Macro* headPointer = macroHead;
+    struct Macro* nextPointer = macroHead->next;
+    do {
+        free(headPointer);
+        headPointer = nextPointer;
+        if (headPointer != NULL)
+            nextPointer = headPointer->next;
+    }
+    while (headPointer != NULL);
+    return 1;
+}
+*/
+
 
 int main(int argc, char *argv[])
 {
     int IC = MEMORY_START;  // Instruction counter
     int DC = 0;  // Data counter
     int i;
-    /*
-    we are passing the command line arguments that are the files that passed to the assembler
-    to the handleSourceFiles function.
-     */
     struct Macro* macroHead = NULL;
     struct Symbol* symbolHead = NULL;
     struct DecodedLine* decodedLineHead = NULL;
@@ -42,13 +52,12 @@ int main(int argc, char *argv[])
         fileName = argv[i];
         int readResult = readMacros(argv[i], macroHead);
         if (readResult) {
-            // Only if there weren't errors reading the file
             int writeResult = writeMacros(fileName, macroHead);
             if (writeResult) {
                 int firstRunResult = firstRun(fileName, &IC, &DC, symbolHead, decodedLineHead, entryHead,
                                               externHead);
                 if (firstRunResult == 1)
-                    secondRun(fileName, &IC, &DC, symbolHead, decodedLineHead, entryHead, externHead);
+                    secondRun(fileName, symbolHead, decodedLineHead, entryHead, externHead);
             }
         }
     }

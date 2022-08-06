@@ -1,6 +1,8 @@
 #ifndef _CONSTS_
 #define _CONSTS_
 
+/* A constants file, to store all kinds of constants that might be re-used in the project */
+
 #define BINARY_WORD_SIZE 10
 #define MEMORY_START 100
 #define OP_SIZE 16
