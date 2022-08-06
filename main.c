@@ -1,10 +1,9 @@
-#include <stdio.h>
 #include "main.h"
 
 
 int main(int argc, char *argv[])
 {
-    int IC = 100;  // Instruction counter
+    int IC = MEMORY_START;  // Instruction counter
     int DC = 0;  // Data counter
     int i;
     /*
@@ -14,6 +13,9 @@ int main(int argc, char *argv[])
     struct Macro* macroHead = NULL;
     struct Symbol* symbolHead = NULL;
     struct DecodedLine* decodedLineHead = NULL;
+    struct Entry* entryHead = NULL;
+    struct Extern* externHead = NULL;
+
     macroHead = (struct Macro*)malloc(sizeof(struct Macro));
     macroHead->name = EMPTY_STRUCT_NAME;
     macroHead->next = NULL;
@@ -21,10 +23,19 @@ int main(int argc, char *argv[])
     symbolHead = (struct Symbol*)malloc(sizeof(struct Symbol));
     symbolHead->name = EMPTY_STRUCT_NAME;
     symbolHead->next = NULL;
+
     decodedLineHead = (struct DecodedLine*)malloc(sizeof(struct DecodedLine));
     decodedLineHead->isEmpty = 1;
     decodedLineHead->length = 0;
     decodedLineHead->next = NULL;
+
+    entryHead = (struct Entry*)malloc(sizeof(struct Entry));
+    entryHead->name = EMPTY_STRUCT_NAME;
+    entryHead->next = NULL;
+
+    externHead = (struct Entry*)malloc(sizeof(struct Entry));
+    externHead->name = EMPTY_STRUCT_NAME;
+    externHead->next = NULL;
 
     char* fileName;
     for (i = 0; i < argc; i++) {
@@ -34,8 +45,10 @@ int main(int argc, char *argv[])
             // Only if there weren't errors reading the file
             int writeResult = writeMacros(fileName, macroHead);
             if (writeResult) {
-                int flag = firstRun(fileName, &IC, &DC, symbolHead, decodedLineHead);
-                break;
+                int firstRunResult = firstRun(fileName, &IC, &DC, symbolHead, decodedLineHead, entryHead,
+                                              externHead);
+                if (firstRunResult == 1)
+                    secondRun(fileName, &IC, &DC, symbolHead, decodedLineHead, entryHead, externHead);
             }
         }
     }

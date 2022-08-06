@@ -1,3 +1,5 @@
+#ifndef CONSTS
+#define CONSTS
 
 #define BINARY_WORD_SIZE 10
 #define MEMORY_START 100
@@ -8,6 +10,7 @@
 #define MAX_LINES 100
 #define SOURCE_FILE_EXTENSION ".as"
 #define PRE_PROCESSING_FILE_EXTENSION ".am"
+#define OBJECT_FILE_EXTENSION ".ob"
 
 /* Directives */
 #define DATA ".data"
@@ -67,27 +70,4 @@ extern const char* OPERATIONS[];
 extern const char* KEYWORDS[];
 extern const char* REGISTERS[];
 
-
-/* Hash Table Hashsize (Result is currently 64)  */
-#define HASHSIZE ((RAM_MEMORY_SIZE / (MAX_LABEL_LEN + 1)) / 4)
-
-/* Masks for creation of to binary word memory image */
-#define A 0x0004
-#define R 0x0002
-#define E 0x0001
-#define IMMEDIATE_ADDR 0x00
-#define DIRECT_ADDR 0x01
-#define INDEX_ADDR 0xA
-#define REGISTER_DIRECT_ADDR 0xB
-
-
-/* Given just random Numbers that will be different then 0*/
-#define _TYPE_DATA 11
-#define _TYPE_STRING 22
-#define _TYPE_ENTRY 33
-#define _TYPE_EXTERNAL 44
-#define _TYPE_CODE 55
-
-/* Sentences */
-#define NEWLINE_DELIMITER '\n'
-#define COMMENT_PREFIX ';'
+#endif

@@ -1,6 +1,5 @@
-//
-// Created by Moshe on 22/07/2022.
-//
-
 #include <string.h>
-#include "preprocessing.h"
+#include <stdio.h>
+#include "processing/preprocessing.h"
+#include "processing/firstrun.h"
+#include "processing/secondrun.h"

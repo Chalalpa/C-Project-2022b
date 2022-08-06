@@ -1,4 +1,8 @@
-#include "consts.h"
+#ifndef OPERATIONS
+#define OPERATIONS
+#include <string.h>
+#include "../helpers/consts.h"
+
 
 struct AddressingMethodsConfig
 {
@@ -36,3 +40,7 @@ static const struct Operation OPERATIONS_TABLE[OP_SIZE] = {
         {RTS, 14, "1110", 0, {0, 0, 0, 0}, {0, 0, 0, 0}},
         {HLT, 15, "1111", 0, {0, 0, 0, 0}, {0, 0, 0, 0}}
 };
+
+int getOperationIndex(char* operationName);
+
+#endif

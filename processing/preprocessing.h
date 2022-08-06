@@ -1,14 +1,11 @@
-//
-// Created by Moshe on 22/07/2022.
-//
-#include "consts.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
-#include "common_utils.h"
-#include "firstrun.h"
+#include "../helpers/consts.h"
+#include "../helpers/common_utils.h"
+
 
 /* Defining a Macro linked list structure*/
 struct Macro {

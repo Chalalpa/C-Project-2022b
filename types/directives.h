@@ -1,9 +1,8 @@
-//
-// Created by Moshe on 02/08/2022.
-//
+#ifndef DIRECTIVES
+#define DIRECTIVES
 
 #include <string.h>
-#include "consts.h"
+#include "../helpers/consts.h"
 
 struct Directive {
     char* name;
@@ -22,3 +21,5 @@ static const struct Directive DIRECTIVES_TABLE[5] = {
 
 
 struct Directive* getDirectiveByName(char* directiveName);
+
+#endif

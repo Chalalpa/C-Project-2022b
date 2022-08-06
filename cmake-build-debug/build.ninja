@@ -55,53 +55,41 @@ build CMakeFiles/untitled4.dir/main.c.obj: C_COMPILER__untitled4_Debug C$:/Users
   OBJECT_DIR = CMakeFiles\untitled4.dir
   OBJECT_FILE_DIR = CMakeFiles\untitled4.dir
 
-build CMakeFiles/untitled4.dir/operations.c.obj: C_COMPILER__untitled4_Debug C$:/Users/Moshe/CLionProjects/C-Project-2022b/operations.c || cmake_object_order_depends_target_untitled4
-  DEP_FILE = CMakeFiles\untitled4.dir\operations.c.obj.d
+build CMakeFiles/untitled4.dir/processing/preprocessing.c.obj: C_COMPILER__untitled4_Debug C$:/Users/Moshe/CLionProjects/C-Project-2022b/processing/preprocessing.c || cmake_object_order_depends_target_untitled4
+  DEP_FILE = CMakeFiles\untitled4.dir\processing\preprocessing.c.obj.d
   FLAGS = -g -std=gnu99
   OBJECT_DIR = CMakeFiles\untitled4.dir
-  OBJECT_FILE_DIR = CMakeFiles\untitled4.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled4.dir\processing
 
-build CMakeFiles/untitled4.dir/decoder.c.obj: C_COMPILER__untitled4_Debug C$:/Users/Moshe/CLionProjects/C-Project-2022b/decoder.c || cmake_object_order_depends_target_untitled4
-  DEP_FILE = CMakeFiles\untitled4.dir\decoder.c.obj.d
+build CMakeFiles/untitled4.dir/helpers/common_utils.c.obj: C_COMPILER__untitled4_Debug C$:/Users/Moshe/CLionProjects/C-Project-2022b/helpers/common_utils.c || cmake_object_order_depends_target_untitled4
+  DEP_FILE = CMakeFiles\untitled4.dir\helpers\common_utils.c.obj.d
   FLAGS = -g -std=gnu99
   OBJECT_DIR = CMakeFiles\untitled4.dir
-  OBJECT_FILE_DIR = CMakeFiles\untitled4.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled4.dir\helpers
 
-build CMakeFiles/untitled4.dir/preprocessing.c.obj: C_COMPILER__untitled4_Debug C$:/Users/Moshe/CLionProjects/C-Project-2022b/preprocessing.c || cmake_object_order_depends_target_untitled4
-  DEP_FILE = CMakeFiles\untitled4.dir\preprocessing.c.obj.d
+build CMakeFiles/untitled4.dir/processing/firstrun.c.obj: C_COMPILER__untitled4_Debug C$:/Users/Moshe/CLionProjects/C-Project-2022b/processing/firstrun.c || cmake_object_order_depends_target_untitled4
+  DEP_FILE = CMakeFiles\untitled4.dir\processing\firstrun.c.obj.d
   FLAGS = -g -std=gnu99
   OBJECT_DIR = CMakeFiles\untitled4.dir
-  OBJECT_FILE_DIR = CMakeFiles\untitled4.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled4.dir\processing
 
-build CMakeFiles/untitled4.dir/common_utils.c.obj: C_COMPILER__untitled4_Debug C$:/Users/Moshe/CLionProjects/C-Project-2022b/common_utils.c || cmake_object_order_depends_target_untitled4
-  DEP_FILE = CMakeFiles\untitled4.dir\common_utils.c.obj.d
+build CMakeFiles/untitled4.dir/helpers/consts.c.obj: C_COMPILER__untitled4_Debug C$:/Users/Moshe/CLionProjects/C-Project-2022b/helpers/consts.c || cmake_object_order_depends_target_untitled4
+  DEP_FILE = CMakeFiles\untitled4.dir\helpers\consts.c.obj.d
   FLAGS = -g -std=gnu99
   OBJECT_DIR = CMakeFiles\untitled4.dir
-  OBJECT_FILE_DIR = CMakeFiles\untitled4.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled4.dir\helpers
 
-build CMakeFiles/untitled4.dir/firstrun.c.obj: C_COMPILER__untitled4_Debug C$:/Users/Moshe/CLionProjects/C-Project-2022b/firstrun.c || cmake_object_order_depends_target_untitled4
-  DEP_FILE = CMakeFiles\untitled4.dir\firstrun.c.obj.d
+build CMakeFiles/untitled4.dir/types/directives.c.obj: C_COMPILER__untitled4_Debug C$:/Users/Moshe/CLionProjects/C-Project-2022b/types/directives.c || cmake_object_order_depends_target_untitled4
+  DEP_FILE = CMakeFiles\untitled4.dir\types\directives.c.obj.d
   FLAGS = -g -std=gnu99
   OBJECT_DIR = CMakeFiles\untitled4.dir
-  OBJECT_FILE_DIR = CMakeFiles\untitled4.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled4.dir\types
 
-build CMakeFiles/untitled4.dir/consts.c.obj: C_COMPILER__untitled4_Debug C$:/Users/Moshe/CLionProjects/C-Project-2022b/consts.c || cmake_object_order_depends_target_untitled4
-  DEP_FILE = CMakeFiles\untitled4.dir\consts.c.obj.d
+build CMakeFiles/untitled4.dir/processing/secondrun.c.obj: C_COMPILER__untitled4_Debug C$:/Users/Moshe/CLionProjects/C-Project-2022b/processing/secondrun.c || cmake_object_order_depends_target_untitled4
+  DEP_FILE = CMakeFiles\untitled4.dir\processing\secondrun.c.obj.d
   FLAGS = -g -std=gnu99
   OBJECT_DIR = CMakeFiles\untitled4.dir
-  OBJECT_FILE_DIR = CMakeFiles\untitled4.dir
-
-build CMakeFiles/untitled4.dir/decodedline.c.obj: C_COMPILER__untitled4_Debug C$:/Users/Moshe/CLionProjects/C-Project-2022b/decodedline.c || cmake_object_order_depends_target_untitled4
-  DEP_FILE = CMakeFiles\untitled4.dir\decodedline.c.obj.d
-  FLAGS = -g -std=gnu99
-  OBJECT_DIR = CMakeFiles\untitled4.dir
-  OBJECT_FILE_DIR = CMakeFiles\untitled4.dir
-
-build CMakeFiles/untitled4.dir/directives.c.obj: C_COMPILER__untitled4_Debug C$:/Users/Moshe/CLionProjects/C-Project-2022b/directives.c || cmake_object_order_depends_target_untitled4
-  DEP_FILE = CMakeFiles\untitled4.dir\directives.c.obj.d
-  FLAGS = -g -std=gnu99
-  OBJECT_DIR = CMakeFiles\untitled4.dir
-  OBJECT_FILE_DIR = CMakeFiles\untitled4.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled4.dir\processing
 
 
 # =============================================================================
@@ -111,7 +99,7 @@ build CMakeFiles/untitled4.dir/directives.c.obj: C_COMPILER__untitled4_Debug C$:
 #############################################
 # Link the executable untitled4.exe
 
-build untitled4.exe: C_EXECUTABLE_LINKER__untitled4_Debug CMakeFiles/untitled4.dir/main.c.obj CMakeFiles/untitled4.dir/operations.c.obj CMakeFiles/untitled4.dir/decoder.c.obj CMakeFiles/untitled4.dir/preprocessing.c.obj CMakeFiles/untitled4.dir/common_utils.c.obj CMakeFiles/untitled4.dir/firstrun.c.obj CMakeFiles/untitled4.dir/consts.c.obj CMakeFiles/untitled4.dir/decodedline.c.obj CMakeFiles/untitled4.dir/directives.c.obj
+build untitled4.exe: C_EXECUTABLE_LINKER__untitled4_Debug CMakeFiles/untitled4.dir/main.c.obj CMakeFiles/untitled4.dir/processing/preprocessing.c.obj CMakeFiles/untitled4.dir/helpers/common_utils.c.obj CMakeFiles/untitled4.dir/processing/firstrun.c.obj CMakeFiles/untitled4.dir/helpers/consts.c.obj CMakeFiles/untitled4.dir/types/directives.c.obj CMakeFiles/untitled4.dir/processing/secondrun.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\untitled4.dir

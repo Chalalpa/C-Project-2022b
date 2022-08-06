@@ -1,7 +1,6 @@
 #include "consts.h"
 
 
-
 const char* DATA_DIRECTIVES[] = {DATA, STRING, STRUCT, "\0"};
 const char* EXTERN_OR_ENTRY[] = {EXTERN, ENTRY, "\0"};
 const char* OPERATIONS[] = {

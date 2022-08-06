@@ -1,14 +1,13 @@
-//
-// Created by Moshe on 29/07/2022.
-//
-
 #include "firstrun.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <unistd.h>
 
+
+/* @ Function: int doesLabelExist(char* labelName, struct Symbol* head)
+   @ Arguments: char* labelName, struct Symbol* head
+   labelName is the name of the label wished to be searched
+   head is the head of the Symbols list
+   @ Description: The function iterates through the symbols list, and check if the given labelName exists there, or not.
+   It will return 1 if it does exist, and 0 if it's not.
+*/
 int doesLabelExist(char* labelName, struct Symbol* head) {
     struct Symbol* headPointer = head;
     while(headPointer != NULL) {
@@ -19,70 +18,13 @@ int doesLabelExist(char* labelName, struct Symbol* head) {
     return 0;
 }
 
-char* getLabelFirstField(char* line_data, char* labelName) {
-    char* lineDataPointer = removeLeadingWhiteSpaces(removeEndingWhiteSpaces(line_data));
-    lineDataPointer += strlen(labelName);
-    if (lineDataPointer[0] == ':') // Including the ':' sign
-        lineDataPointer++;
-    lineDataPointer = removeLeadingWhiteSpaces(lineDataPointer);
-    char *fieldName = (char *)calloc(strlen(lineDataPointer) + 1, sizeof(char));
-    char *fieldNamePointer = fieldName;
-    while (*lineDataPointer && !isspace(*lineDataPointer)) {
-        *fieldNamePointer = *lineDataPointer;
-        fieldNamePointer++;
-        lineDataPointer++;
-    }
-    return fieldName;
-}
-
-int isLabelDirective(char* line_data, char* labelName) {
-    char* lineDataPointer = line_data;
-    lineDataPointer += strlen(labelName) + 1; // Including the ':' sign
-    char* lineWithoutLabelDeclaration = removeLeadingWhiteSpaces(lineDataPointer);
-    char *fieldName = (char *) malloc(strlen(lineWithoutLabelDeclaration) + 1);
-    char *fieldNamePointer = fieldName;
-    while (*lineWithoutLabelDeclaration && !isspace(*lineWithoutLabelDeclaration)) {
-        *fieldNamePointer = *lineWithoutLabelDeclaration;
-        fieldNamePointer++;
-        lineWithoutLabelDeclaration++;
-    }
-    if (!*lineWithoutLabelDeclaration) {
-        printf("No data found after label declaration: %s\n", line_data);
-        return 0;
-    }
-    return fieldNamePointer;
-}
-
-char* getLabelName(char* line_data) {
-    if (isCommentLine(line_data) || isEmptyLine(line_data))
-        return 0;
-    char *leftTrimmedLine = removeLeadingWhiteSpaces(line_data);
-    char *labelName = (char *) calloc(strlen(leftTrimmedLine) + 1, sizeof(char));
-    char *labelNamePointer = labelName;
-    while (*leftTrimmedLine && !isspace(*leftTrimmedLine) && *leftTrimmedLine != ':') {
-        *labelNamePointer = *leftTrimmedLine;
-        labelNamePointer++;
-        leftTrimmedLine++;
-    }
-    if (!*leftTrimmedLine || isspace(*leftTrimmedLine)) {
-        // No ':' found until first space
-        return 0;
-    }
-    // We found ':'
-    if(!isspace(*(leftTrimmedLine + 1))) {
-        // if the next char after the ':' is not a whitespace, it's not a legal label
-        printf("Found trailing chars after label's declaration, expected a whitespace: %s\n", line_data);
-        return 0;
-    }
-    *labelNamePointer = '\0';
-    realloc(labelName, strlen(labelName) + 1);
-    if(isValidLabel(labelName))
-        return labelName;
-    // If label is not valid, the function should print the exact reason
-    return 0;
-
-}
-
+/* @ Function: char** getOperands(char* trimmedLine, int operandsLimit)
+   @ Arguments: char* trimmedLine, int operandsLimit
+   trimmedLine is the line that we want to extract operands from (without the label/operation/directive)
+   operandsLimit is amount of the maximum operands we would like to get
+   @ Description: The function extracts and returns, an array containing the operands given in the sentence
+   (that are separated by commas).
+*/
 char** getOperands(char* trimmedLine, int operandsLimit) {
     int operandsCount = 0;
     char** operands = (char**)calloc(operandsLimit + 1, MAX_LINE_LEN * sizeof(char));
@@ -106,6 +48,15 @@ char** getOperands(char* trimmedLine, int operandsLimit) {
     return operands;
 }
 
+
+/* @ Function: struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data)
+   @ Arguments: char* directiveName, char* line_data
+   directiveName is the specific directive in the line
+   line_data is the data wished to be decoded
+   @ Description: The function decodes the given directive sentence to binary code machine, according to the
+   assembler rules. If an error was found during the decoding phase, it will return 0, and print the relevant error.
+   If the decoding was successful, the function will return a new DecodedLine* object with the relevant data.
+*/
 struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data) {
     struct Directive* directivePointer = getDirectiveByName(directiveName);
     if (!directivePointer) {
@@ -125,7 +76,7 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
         char** operands = getOperands(trimmedLine, directive.maxOperandsNum);
         int operandsCount = 0;
         while(operands[operandsCount]) {
-            if(isNumber(operands[operandsCount])) {
+            if(isValidNumber(operands[operandsCount])) {
                 decoded->binaryValue[operandsCount] = (char*)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
                 strcpy(decoded->binaryValue[operandsCount], decToBinary(atoi(operands[operandsCount]), 10));
             }
@@ -161,7 +112,7 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
     }
     if (!strcmp(directiveName, STRUCT)) {
         char **operands = getOperands(trimmedLine, 1);
-        if (!isNumber(operands[0])) {
+        if (!isValidNumber(operands[0])) {
             printf("Error! first operand of %s data directive must be valid string/number: %s\n", STRUCT,
                    line_data);
             return 0;
@@ -183,7 +134,7 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
         strncpy(string, trimmedLine, strlen(trimmedLine));
         string[strlen(trimmedLine)] = '\0';
         if (!isValidString(string)) {
-            printf("Error! Struct's second field must be a valid string: %s", line_data);
+            printf("Error! Struct's second field must be a valid string: %s\n", line_data);
             return 0;
         }
         trimmedLine++;  // Skip the '"'
@@ -204,10 +155,16 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
         }
         return decoded;
     }
-    printf("Error! No valid directive was found under the name of %s\n: %s\n", directiveName, line_data);
+    printf("Error! No valid directive was found under the name of %s: %s\n", directiveName, line_data);
     return 0;
 }
 
+/* @ Function: int getDecodedLineLength(struct DecodedLine* line)
+   @ Arguments: struct DecodedLine* line
+   line - the DecodedLine* object we want to get its length
+   @ Description: The function checks what's the number of binary machine code lines are extracted from the given line,
+   and return it.
+*/
 int getDecodedLineLength(struct DecodedLine* line) {
     int i;
     int lengthCounter = 0;
@@ -217,15 +174,14 @@ int getDecodedLineLength(struct DecodedLine* line) {
     return lengthCounter;
 }
 
-int getYetDecodedLineLength(struct DecodedLine* line) {
-    int i;
-    int lengthCounter = 0;
-    for (i=0; i < 5; i++)
-        if(line->binaryValue[i] == TO_BE_FILLED)
-            lengthCounter++;
-    return lengthCounter;
-}
-
+/* @ Function: struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_data)
+   @ Arguments: struct Operation operation, char* line_data
+   operation is the Operation object of the relevant line wished to be decoded
+   line_data is the data wished to be decoded
+   @ Description: The function decodes the given operative sentence to binary code machine, according to the
+   assembler rules. If an error was found during the decoding phase, it will return 0, and print the relevant error.
+   If the decoding was successful, the function will return a new DecodedLine* object with the relevant data.
+*/
 struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_data) {
     if (isCommentLine(line_data) || isEmptyLine(line_data))
         return 0;
@@ -239,7 +195,7 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
     }
     if(!*(leftTrimmedLine + 2)) {
         // If we couldn't find the operation
-        printf("Could not find operation %s in line %s:", operation.name, line_data);
+        printf("Could not find operation %s in line %s:\n", operation.name, line_data);
         return 0;
     }
     leftTrimmedLine += 3;
@@ -299,9 +255,9 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
         int sourceOperand = 0;
         if (operandsCount == 2 && i == 0)
             sourceOperand = 1;  // Current operand that we are looking at is the source operand
-        int indexAddressing = getIndexAddressing(operands[i]);  //S3.1 for example
+        int indexAddressing = getAddressingIndex(operands[i]);  //S3.1 for example
         if (startsWith(operands[i], "#")) {
-            if (!isNumber(operands[i] + 1)) {
+            if (!isValidNumber(operands[i] + 1)) {
                 printf("Error! Expected a number after '#' sign: %s\n", line_data);
                 return 0;
             }
@@ -430,8 +386,23 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
     return decoded;
 }
 
-
-int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead) {
+/* @ Function: firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead,
+        struct Entry* entryHead, struct Extern* externHead);
+   @ Arguments: char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead,
+        struct Entry* entryHead, struct Extern* externHead
+   file_name is the path that we should read from, without its extension
+   IC, is a pointer to current Instruction Counter
+   DC, is a pointer to current Data Counter
+   symbolHead, that represents head of Symbol linked list.
+   decodedLineHead, that represents head of DecodedLine linked list.
+   entryHead, that represents head of Entry linked list.
+   externHead, that represents head of Extern linked list.
+   @ Description: The function goes through the .am file that should've been created earlier, verifies and decodes the
+   file into binary machine code. In addition, it assigns values to the relevant lists, through the heads provided.
+   The function will return 1 if the first run was successful, and 0 if not.
+*/
+int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead,
+             struct Entry* entryHead, struct Extern* externHead) {
     // Conduct full file path
     char* full_file_path = (char*)calloc(strlen(file_name) + strlen(PRE_PROCESSING_FILE_EXTENSION)
             ,sizeof(char));
@@ -476,7 +447,8 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
             // If a valid label was found, turn on proper flag
             isLabel = 1;
             if (doesLabelExist(labelName, symbolHead)) {
-                printf("Error! Label with this name was already initialized earlier in the file: %s\n", line_data);
+                printf("Error! Label with this name was already initialized earlier in the file, err line %d: %s\n",
+                       i, line_data);
                 return 0;
             }
         }
@@ -489,7 +461,8 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
         tmpSymbol->name = (char*)calloc(strlen(labelName), sizeof(char));
         strcpy(tmpSymbol->name, labelName);
 
-        char* labelFirstField = getLabelFirstField(line_data, labelName);
+
+        char* labelFirstField = getNextField(removeLeadingWhiteSpaces(line_data) + strlen(labelName));
         if (isDirective(labelFirstField)) {
             // Handling directives
             if (isDataDirective(labelFirstField)) {
@@ -507,28 +480,64 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
                     *IC += decodedLine->length;
                 }
                 else {
-                    printf("Error! Couldn't decode line: %s\n", line_data);
+                    printf("Error! Couldn't decode line number %d: %s\n", i, line_data);
                     return 0;
                 }
 
             } else if (isExternOrEntryDirective(labelFirstField)) {
                 // Ignore label, it's meaningless in this case
+                tmpSymbol = NULL;
+                char* name = getNextField(
+                        line_data + strlen(labelName) + strlen(labelFirstField));
+                if (name == 0) {
+                    printf("Error! There must be a name attached to %s directives in line %d: %s\n",
+                           labelFirstField, i, line_data);
+                    return 0;
+                }
+                if(!isValidLabel(name)) {
+                    printf("Error! Found %s declaration for an invalid label in line %d: %s\n",
+                           labelFirstField, i, line_data);
+                    return 0;
+                }
+                char* trailingChars = getNextField(line_data + strlen(labelName) +
+                                                         strlen(labelFirstField) + strlen(name));
+                if (trailingChars) {
+                    printf("Error! Found trailing chars after entry declaration in line %d: %s\n", i,
+                           line_data);
+                    return 0;
+                }
+                // Entry/Extern is valid. Adding it to Entries/Externs and Symbols lists
+                tmpSymbol = (struct Symbol*)malloc(sizeof(struct Symbol));
+                tmpSymbol->next = NULL;
+                tmpSymbol->name = (char*)calloc(strlen(labelName), sizeof(char));
+                strcpy(tmpSymbol->name, name);
+                strcpy(tmpSymbol->name, name);
+                tmpSymbol->type = labelFirstField;
                 if(!strcmp(labelFirstField, EXTERN)) { // Check if it's an extern directive
-                    tmpSymbol = NULL;
-                    // Do what's .extern directive needs...
+                    struct Extern* externTmp = (struct Extern*)malloc(sizeof(struct Extern));
+                    externTmp->next = NULL;
+                    externTmp->name = (char*)calloc(strlen(name), sizeof(char));
+                    strcpy(externTmp->name, name);
+                    externHead->next = externTmp;
+                    externHead = externTmp;
                 }
                 else {
-                    // Code for handling .entry directive...
+                    struct Entry* entryTmp = (struct Entry*)malloc(sizeof(struct Entry));
+                    entryTmp->next = NULL;
+                    entryTmp->name = (char*)calloc(strlen(name), sizeof(char));
+                    strcpy(entryTmp->name, name);
+                    entryHead->next = entryTmp;
+                    entryHead = entryTmp;
                 }
             }
         }
         else {
-            // Handling 'code' sentence
+            // Handling operative sentence
             tmpSymbol->type = (char*)calloc(strlen(CODE), sizeof(char));
             tmpSymbol->type = CODE;
             tmpSymbol->value = *IC;
-            if (!isOperation(labelFirstField)) {.
-                printf("Error! '%s' is not a valid operation: %s\n", labelFirstField, line_data);
+            if (!isOperation(labelFirstField)) {
+                printf("Error! '%s' is not a valid operation in line %d: %s\n", i, labelFirstField, line_data);
                 return 0;
             }
             else {
@@ -536,22 +545,25 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
                 struct Operation operation = OPERATIONS_TABLE[operationIndex];
                 struct DecodedLine* decodedLine = decodeOperationLine(operation, line_data);
                 if (decodedLine != 0) {
+                    decodedLine->lineNum = i;
                     decodedLineHead->next = decodedLine;
                     decodedLineHead = decodedLine;
                     *IC += decodedLine->length;
                     *DC += decodedLine->length;
                 }
                 else {
-                    printf("Error! Couldn't decode line: %s\n", line_data);
+                    printf("Error! Couldn't decode line number %d: %s\n", i, line_data);
                     return 0;
                 }
             }
         }
-        if (isLabel) {
+        if (isLabel && tmpSymbol != 0) {
             symbolHead->next = tmpSymbol;
             symbolHead = tmpSymbol;
         }
         i++;
     }
+
+    fclose(file_pointer);
     return 1;
 }

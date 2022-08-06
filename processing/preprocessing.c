@@ -1,6 +1,3 @@
-//
-// Created by Moshe on 22/07/2022.
-//
 #include "preprocessing.h"
 
 
