@@ -1,0 +1,9 @@
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Ignoring empty line number 11: 		
+
+Error! operands count num is less than minimum 1 or more than maximum 80: 	.data
+Error! Couldn't decode line number 17: K:	.data

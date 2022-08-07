@@ -1,0 +1,8 @@
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Error. label name exceeds limit (30): MAINMAINMAINMAINMAINMAINMAINMAINMAINMAINMAIN
+Error! 'MAINMAINMAINMAINMAINMAINMAINMAINMAINMAINMAIN:' is not a valid operation in line 4: MAINMAINMAINMAINMAINMAINMAINM
+AINMAINMAINMAIN:        mov S1.1                , W

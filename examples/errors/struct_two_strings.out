@@ -1,0 +1,9 @@
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Ignoring empty line number 11: 		
+
+Error! first operand of .struct data directive must be valid number: 	.struct "8", "ab"
+Error! Couldn't decode line number 18: S1:	.struct "8", "ab"

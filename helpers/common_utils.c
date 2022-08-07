@@ -318,6 +318,12 @@ int isValidNumber(char* string) {
     while(*strPointer)
         if(!isdigit(*strPointer++))
             return 0;
+    strPointer = string;
+    if (*strPointer == '-' || *strPointer == '+')
+        strPointer++;
+    int num = atoi(strPointer);
+    if (num > 256)
+        return 0;
     return 1;
 }
 

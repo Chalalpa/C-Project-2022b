@@ -1,0 +1,7 @@
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Error. label's name is actually a keyword: lea
+Error! Found .extern declaration for an invalid label in line 4: .extern lea

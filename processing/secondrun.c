@@ -34,6 +34,23 @@ struct Extern* getExtern(struct Extern* externHead, char* externName) {
     return 0;
 }
 
+/* @ Function: getEntry(struct Entry* entryHead, char* entryName);
+   @ Arguments: struct Entry* entryHead, char* entryName
+   entryHead, represents head of Entry linked list.
+   entryName is the name of the entry wished to be found
+   @ Description: The function iterates through the Entries list and finds the extern requested by its name.
+   It returns it, if it was found in the list, or 0, if it wasn't found.
+*/
+struct Entry* getEntry(struct Entry* entryHead, char* entryName) {
+    struct Entry* headPointer = entryHead;
+    while(headPointer != NULL) {
+        if (!strcmp(entryName, headPointer->name))
+            return headPointer;
+        headPointer = headPointer->next;
+    }
+    return 0;
+}
+
 /* @ Function: int writeEntriesFile(char* fileName, struct Entry* entryHead, struct Symbol* symbolHead);
    @ Arguments: char* fileName, struct Entry* entryHead, struct Symbol* symbolHead
    fileName is the path that we should write to, without extension
@@ -56,6 +73,8 @@ int writeEntriesFile(char* fileName, struct Entry* entryHead, struct Symbol* sym
             if (!symbol) {
                 printf("Error! Entry %s declared in line %d is not initialized later in the file\n",
                        entryPointer->name, entryPointer->lineNum);
+                fclose(file_writer_pointer);
+                remove(new_file_path);
                 return 0;
             }
             entriesCount++;
@@ -107,6 +126,8 @@ int writeExternsFile(char* fileName, struct Extern* externHead, struct Symbol* s
                     if (externPointer == NULL) {
                         printf("Error! Found usage of undefined symbol - %s in line %d\n",
                                name, decodeLinePointer->lineNum);
+                        remove(new_file_path);
+                        fclose(file_writer_pointer);
                         return 0;
                     }
                     fprintf(file_writer_pointer, "%s %s\n", externPointer->name,
@@ -128,6 +149,8 @@ int writeExternsFile(char* fileName, struct Extern* externHead, struct Symbol* s
                     if (externPointer == NULL) {
                         printf("Error! Found usage of undefined symbol - %s in line %d\n",
                                name, decodeLinePointer->lineNum);
+                        fclose(file_writer_pointer);
+                        remove(new_file_path);
                         return 0;
                     }
                     int addressValue;
@@ -172,6 +195,29 @@ int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* de
     // Iteration helper:
     int i;
     struct DecodedLine* linePointer = decodedLineHead;
+
+    struct Extern* externPointer = externHead;
+    // Getting the first valuable Extern object
+    while (externPointer != NULL && (!strcmp(externPointer->name, EMPTY_STRUCT_NAME)))
+        externPointer = externPointer->next;
+
+    // Verifying our externs are not already-defined symbols/entries, they should be defined in some other files:
+    while(externPointer != NULL) {
+        char* externName = externPointer->name;
+        struct Entry* entryPointer = getEntry(entryHead, externName);
+        if (entryPointer != NULL) {
+            printf("Error! Can't define extern and entry with the same name. Entry defined in line %d, "
+                   "Extern defined in line %d\n", entryPointer->lineNum, externPointer->lineNum);
+            return 0;
+        }
+        struct Symbol* symbolPointer = getSymbol(symbolHead, externName);
+        if (symbolPointer != NULL) {
+            printf("Error! Can't define extern and symbol with the same name. Symbol defined in line %d, "
+                   "Extern defined in line %d\n", symbolPointer->lineNum, externPointer->lineNum);
+            return 0;
+        }
+        externPointer = externPointer->next;
+    }
 
     // Getting the first valuable DecodedLine object
     while (linePointer != NULL && linePointer->isEmpty == 1)

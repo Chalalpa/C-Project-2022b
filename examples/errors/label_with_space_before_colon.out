@@ -1,0 +1,6 @@
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Error! 'MAIN' is not a valid operation in line 5: MAIN :        mov S1.1                , W

@@ -1,0 +1,9 @@
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Ignoring empty line number 11:
+
+Error! found an invalid string under .string data directive declaration:  .string abcdef"
+Error! Couldn't decode line number 15: STR: .string abcdef"

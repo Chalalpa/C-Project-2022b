@@ -1,0 +1,4 @@
+==============Reading Macros===============
+Error. Found trailing chars after reading macro name. Line data:        macro m1 m2
+
+Error reading macros in line 8, discarding writing .am file

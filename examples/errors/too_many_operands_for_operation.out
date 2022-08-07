@@ -1,0 +1,7 @@
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Error! expected 2 operands for operation add, found more: 	add r2,STR,r1,r4,r5
+Error! Couldn't decode line number 6: 	add r2,STR,r1,r4,r5

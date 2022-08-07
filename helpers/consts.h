@@ -23,6 +23,11 @@
 #define STRUCT ".struct"
 #define ENTRY ".entry"
 #define EXTERN ".extern"
+#define DATA_NO_DOT "data"
+#define STRING_NO_DOT "string"
+#define STRUCT_NO_DOT "struct"
+#define ENTRY_NO_DOT "entry"
+#define EXTERN_NO_DOT "extern"
 
 /* Symbols */
 #define CODE "code"

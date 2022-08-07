@@ -1,0 +1,7 @@
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Error! expected 1 operands for operation inc, found more: 		inc	K, r3
+Error! Couldn't decode line number 10: 		inc	K, r3

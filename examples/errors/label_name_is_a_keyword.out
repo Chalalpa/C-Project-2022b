@@ -1,0 +1,7 @@
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Error. label's name is actually a keyword: mov
+Error! 'mov:' is not a valid operation in line 5: mov:  mov S1.1                , W

@@ -1,0 +1,3 @@
+==============Reading Macros===============
+Error. Found non alpha-numeric char in macro's name declaration: n!oder
+Error reading macros in line 8, discarding writing .am file

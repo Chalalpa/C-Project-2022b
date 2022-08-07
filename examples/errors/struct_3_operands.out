@@ -1,0 +1,9 @@
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Ignoring empty line number 11:
+
+Error! Struct's second field must be a valid string:    .struct 8, "ab", "bc"
+Error! Couldn't decode line number 18: S1:      .struct 8, "ab", "bc"

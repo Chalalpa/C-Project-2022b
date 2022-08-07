@@ -24,7 +24,8 @@ const char* OPERATIONS[] = {
         "\0",
 };
 const char* KEYWORDS[] = {R0, R1, R2, R3, R4, R5, R6, R7, MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE,
-                          GET, PRN, JSR, RTS, HLT, MACRO_START, MACRO_END, DATA, STRING, STRUCT, ENTRY, EXTERN, "\0"};
+                          GET, PRN, JSR, RTS, HLT, MACRO_START, MACRO_END, DATA, STRING, STRUCT, ENTRY, EXTERN,
+                          DATA_NO_DOT, STRING_NO_DOT, STRUCT_NO_DOT, ENTRY_NO_DOT, EXTERN_NO_DOT,"\0"};
 const char* REGISTERS[] = {R0, R1, R2, R3, R4, R5, R6, R7, "\0"};
 
 const char SPECIAL_BASE32[32] = {'!', '@', '#', '$', '%', '^', '&', '*', '<', '>', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',

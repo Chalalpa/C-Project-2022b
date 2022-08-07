@@ -1,0 +1,9 @@
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Ignoring empty line number 11: 		
+
+Error! expected 0 operands for operation hlt, found more: 	END:   hlt K
+Error! Couldn't decode line number 14: 	END:   hlt K

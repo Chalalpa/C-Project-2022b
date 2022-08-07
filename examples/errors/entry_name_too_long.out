@@ -1,0 +1,8 @@
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Error. label name exceeds limit (30): LOOPLOOPLOOPLOOPLOOPLOOPLOOPLOOPLOOPLOOPLOOPLOOPLOOPLOOPLOOP
+Error! Found .entry declaration for an invalid label in line 1: .entry LOOPLOOPLOOPLOOPLOOPLOOPLOOPLOOPLOOPLOOPLOOPLOOPL
+OOPLOOPLOOP

@@ -24,7 +24,11 @@ int isMacroEnd(char * line_data) {
     if (isCommentLine(line_data) || isEmptyLine(line_data))
         return 0;
     char* leftTrimmedLine = removeLeadingWhiteSpaces(line_data);
-    return startsWith(leftTrimmedLine, MACRO_END);
+    if(!startsWith(leftTrimmedLine, MACRO_END))
+        return 0;
+    leftTrimmedLine += strlen(MACRO_END);
+    leftTrimmedLine = removeLeadingWhiteSpaces(leftTrimmedLine);
+    return(isEmptyLine(leftTrimmedLine));
 }
 
 /* @ Function: char* parseMacroName(char * line_data);
@@ -120,6 +124,24 @@ char* isMacroCall(char* line_data, struct Macro* head) {
     return macroName;
 }
 
+/* @ Function: getMacro(char * macroName, struct Macro* macroHead);
+   @ Arguments: char * macroName, struct Macro* macroHead
+   macroName, that represents the requested macro name
+   macroHead, that represents the head of the Macros linked list
+   @ Description: The function searches and returns the macro by its name, from the Macros list.
+   If it doesn't exist, it returns 0.
+*/
+struct Macro* getMacro(char * macroName, struct Macro* macroHead) {
+    struct Macro *tmp = macroHead;
+    while (tmp != NULL) {
+        if (!strcmp(tmp->name, macroName)) {
+            return tmp;
+        }
+        tmp = tmp->next;
+    }
+    return 0;
+}
+
 
 /* @ Function: int writeMacroContent(char* macroName, FILE* file_writer_pointer, struct Macro* head);
    @ Arguments: char* macroName, FILE* file_writer_pointer, struct Macro* head
@@ -130,15 +152,7 @@ char* isMacroCall(char* line_data, struct Macro* head) {
    in the macros list, 0 if not.
 */
 int writeMacroContent(char* macroName, FILE* file_writer_pointer, struct Macro* head) {
-    struct Macro *tmp;
-    tmp = head;
-    while (tmp != NULL) {
-        if (!strcmp(tmp->name, macroName)) {
-            // Found requested macro
-            break;
-        }
-        tmp = tmp->next;
-    }
+    struct Macro * tmp = getMacro(macroName, head);
     if (tmp != NULL) {
         fprintf(file_writer_pointer, "%s", tmp->data);
         return 1;
@@ -170,19 +184,29 @@ int readMacros(char* file_name, struct Macro* head) {
         free(full_file_path);
         return 0;
     }
-    char line_data[MAX_LINE_LEN + 1];
-    memset(line_data, '\0', MAX_LINE_LEN + 1);
+    // We initialize it with + 3, to ensure we have space for \n, for the '\0' char,
+    // and for another potential char (to verify we don't exceed from max line length limit)
+    char line_data[MAX_LINE_LEN + 3];
+    memset(line_data, '\0', MAX_LINE_LEN + 3);
     int i = 0;
     int foundMacro = 0;
     struct Macro *tmp;
     char* macroName;
-    while(fgets(line_data, MAX_LINE_LEN + 1, file_pointer)) {
-        if (strlen(line_data) > MAX_LINE_LEN)
-            printf("Error! Line %d of file %s exceeds line length limit (%d)\n", i, full_file_path, MAX_LINE_LEN);
+    while(fgets(line_data, MAX_LINE_LEN + 3, file_pointer)) {
+        if (strlen(line_data) > MAX_LINE_LEN + 1) {  // Including last \n char
+            printf("Error! Line %d of file %s exceeds line length limit (%d)\n",
+                   i + 1, full_file_path, MAX_LINE_LEN);
+            free(full_file_path);
+            return 0;
+        }
         else {
             if (isMacroStart(line_data)) {
                 macroName = parseMacroName(line_data);
                 if (macroName) {
+                    if (getMacro(macroName, head)) {
+                        printf("Error! macro defined in line %d was already defined earlier: %s", i + 1, line_data);
+                        return 0;
+                    }
                     foundMacro = 1;
                     tmp = NULL;
                     tmp = (struct Macro*)malloc(sizeof(struct Macro));
@@ -192,6 +216,11 @@ int readMacros(char* file_name, struct Macro* head) {
                     strcpy(tmp->name, macroName);
                     head->next = tmp;
                     head = tmp;
+                }
+                else {
+                    printf("Error reading macros in line %d, discarding writing .am file\n", i + 1);
+                    free(full_file_path);
+                    return 0;
                 }
             }
             else {
@@ -205,6 +234,12 @@ int readMacros(char* file_name, struct Macro* head) {
             }
         }
         i++;
+    }
+    if (foundMacro) {
+        printf("Error! couldn't find '%s' as a macro finish, to %s macro", MACRO_END, macroName);
+        free(macroName);
+        free(full_file_path);
+        return 0;
     }
     fclose(file_pointer);
     free(macroName);
@@ -231,8 +266,10 @@ int writeMacros(char* file_name, struct Macro* head) {
     int foundMacro = 0;
     FILE *file_reader_pointer;
     FILE *file_writer_pointer;
-    char line_data[MAX_LINE_LEN];
-    memset(line_data, '\0', MAX_LINE_LEN);
+    // We initialize it with + 3, to ensure we have space for \n, for the '\0' char,
+    // and for another potential char (to verify we don't exceed from max line length limit)
+    char line_data[MAX_LINE_LEN + 3];
+    memset(line_data, '\0', MAX_LINE_LEN + 3);
     file_reader_pointer = fopen(full_file_path,"r");
     if (file_reader_pointer == NULL) {
         printf("Error reading given file '%s'. Cannot write '.am' file\n", full_file_path);
@@ -242,9 +279,10 @@ int writeMacros(char* file_name, struct Macro* head) {
     }
     file_writer_pointer = fopen(new_file_path,"w");
     int i = 0;
-    while(fgets(line_data, MAX_LINE_LEN + 1, file_reader_pointer)) {
-        if (strlen(line_data) > MAX_LINE_LEN)
-            printf("Error! Line %d of file %s exceeds line length limit (%d)\n", i, full_file_path, MAX_LINE_LEN);
+    while(fgets(line_data, MAX_LINE_LEN + 3, file_reader_pointer)) {
+        if (strlen(line_data) > MAX_LINE_LEN + 1)  // Including last \n char
+            printf("Error! Line %d of file %s exceeds line length limit (%d)\n",
+                   i + 1, full_file_path, MAX_LINE_LEN);
         else if (!foundMacro) {
                 if (!isMacroStart(line_data)) {
                     char* macroName = isMacroCall(line_data, head);
@@ -262,6 +300,14 @@ int writeMacros(char* file_name, struct Macro* head) {
                  if (isMacroEnd(line_data))
                     foundMacro = 0;
         i++;
+    }
+    if (foundMacro) {
+        printf("Error! couldn't find '%s' as a macro finish, to some macro", MACRO_END);
+        fclose(file_writer_pointer);
+        remove(new_file_path);
+        free(full_file_path);
+        free(new_file_path);
+        return 0;
     }
     fclose(file_reader_pointer);
     fclose(file_writer_pointer);

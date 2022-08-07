@@ -1,0 +1,6 @@
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Error! There must be a name attached to .entry directives in line 3: .entry

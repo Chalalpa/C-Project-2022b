@@ -1,0 +1,9 @@
+==============Reading Macros===============
+No such file: 'C:\Users\Moshe\CLionProjects\C-Project-2022b\cmake-build-debug\untitled4.exe.as'
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Error! operation lea does not support reg addressing from source: lea r3, r4
+Error! Couldn't decode line number 5: lea r3, r4

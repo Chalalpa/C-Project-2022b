@@ -14,7 +14,7 @@ struct Directive {
 
 /* A static const represents the supported directives and their configurations*/
 static const struct Directive DIRECTIVES_TABLE[5] = {
-        {DATA, 0, MAX_LINE_LEN},
+        {DATA, 1, MAX_LINE_LEN},
         {STRING, 1, 1},
         {STRUCT, 2, 2},
         {ENTRY, 1, 1},

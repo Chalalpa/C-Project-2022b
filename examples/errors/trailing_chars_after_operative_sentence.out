@@ -1,0 +1,9 @@
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Ignoring empty line number 11:
+
+Error! Found whitespace in an operand:  bne L3 r2
+Error! Couldn't decode line number 13:  bne L3 r2
