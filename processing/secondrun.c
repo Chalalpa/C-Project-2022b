@@ -61,15 +61,17 @@ struct Entry* getEntry(struct Entry* entryHead, char* entryName) {
 */
 int writeEntriesFile(char* fileName, struct Entry* entryHead, struct Symbol* symbolHead) {
     struct Entry* entryPointer = entryHead;
-    FILE *file_writer_pointer;
-    char* new_file_path = (char*)malloc(strlen(fileName) + strlen(PRE_PROCESSING_FILE_EXTENSION));
-    strcpy(new_file_path, fileName);
-    strncat(new_file_path, ENTRIES_FILE_EXTENSION, strlen(ENTRIES_FILE_EXTENSION));
-    file_writer_pointer = fopen(new_file_path,"w");
+    struct Symbol* symbol;
     int entriesCount = 0;
+    char* new_file_path;
+    FILE *file_writer_pointer;
+    new_file_path = (char*)malloc(strlen(fileName) + strlen(PRE_PROCESSING_FILE_EXTENSION));
+    strcpy(new_file_path, fileName);
+    strcat(new_file_path, ENTRIES_FILE_EXTENSION);
+    file_writer_pointer = fopen(new_file_path,"w");
     while (entryPointer != NULL) {
         if (strcmp(entryPointer->name, EMPTY_STRUCT_NAME)) {
-            struct Symbol* symbol = getSymbol(symbolHead, entryPointer->name);
+            symbol = getSymbol(symbolHead, entryPointer->name);
             if (!symbol) {
                 printf("Error! Entry %s declared in line %d is not initialized later in the file\n",
                        entryPointer->name, entryPointer->lineNum);
@@ -104,25 +106,28 @@ int writeEntriesFile(char* fileName, struct Entry* entryHead, struct Symbol* sym
 int writeExternsFile(char* fileName, struct Extern* externHead, struct Symbol* symbolHead,
                      struct DecodedLine* decodedLineHead) {
     struct DecodedLine* decodeLinePointer = decodedLineHead;
+    struct Symbol* symbol;
+    struct Extern* externPointer;
+    int addressValue, externsCount = 0;
+    char* new_file_path, *name;
     FILE *file_writer_pointer;
-    char* new_file_path = (char*)malloc(strlen(fileName) + strlen(PRE_PROCESSING_FILE_EXTENSION));
+    new_file_path = (char*)malloc(strlen(fileName) + strlen(PRE_PROCESSING_FILE_EXTENSION));
     strcpy(new_file_path, fileName);
-    strncat(new_file_path, EXTERNS_FILE_EXTENSION, strlen(EXTERNS_FILE_EXTENSION));
+    strcat(new_file_path, EXTERNS_FILE_EXTENSION);
     file_writer_pointer = fopen(new_file_path,"w");
-    int externsCount = 0;
     while (decodeLinePointer != NULL) {
         if (!decodeLinePointer->isEmpty) {
             if (decodeLinePointer->srcOperandName != NULL && !(isRegister(decodeLinePointer->srcOperandName))
                 && !(*decodeLinePointer->srcOperandName == '#')) {
-                char* name = (char*)calloc(strlen(decodeLinePointer->srcOperandName),
+                name = (char*)calloc(strlen(decodeLinePointer->srcOperandName),
                                                  sizeof(char));
                 strcpy(name, decodeLinePointer->srcOperandName);
                 if (!strcmp(name + strlen(name) - 2, ".1") ||
                     !strcmp(name + strlen(name) - 2, ".2"))
                     name[strlen(name) - 2] = '\0';
-                struct Symbol* symbol = getSymbol(symbolHead, name);
+                symbol = getSymbol(symbolHead, name);
                 if (symbol == NULL) {
-                    struct Extern* externPointer = getExtern(externHead, name);
+                    externPointer = getExtern(externHead, name);
                     if (externPointer == NULL) {
                         printf("Error! Found usage of undefined symbol - %s in line %d\n",
                                name, decodeLinePointer->lineNum);
@@ -137,15 +142,15 @@ int writeExternsFile(char* fileName, struct Extern* externHead, struct Symbol* s
             }
             if (decodeLinePointer->tgtOperandName != NULL && !(isRegister(decodeLinePointer->tgtOperandName))
                 && !(*decodeLinePointer->tgtOperandName == '#')) {
-                char* name = (char*)calloc(strlen(decodeLinePointer->tgtOperandName),
+                name = (char*)calloc(strlen(decodeLinePointer->tgtOperandName),
                                            sizeof(char));
                 strcpy(name, decodeLinePointer->tgtOperandName);
                 if (!strcmp(name + strlen(name) - 2, ".1") ||
                     !strcmp(name + strlen(name) - 2, ".2"))
                     name[strlen(name) - 2] = '\0';
-                struct Symbol* symbol = getSymbol(symbolHead, name);
+                symbol = getSymbol(symbolHead, name);
                 if (symbol == NULL) {
-                    struct Extern* externPointer = getExtern(externHead, name);
+                    externPointer = getExtern(externHead, name);
                     if (externPointer == NULL) {
                         printf("Error! Found usage of undefined symbol - %s in line %d\n",
                                name, decodeLinePointer->lineNum);
@@ -153,7 +158,6 @@ int writeExternsFile(char* fileName, struct Extern* externHead, struct Symbol* s
                         remove(new_file_path);
                         return 0;
                     }
-                    int addressValue;
                     if (decodeLinePointer->binaryValue[1] == NULL)
                         addressValue = decodeLinePointer->value + 1;
                     else
@@ -189,28 +193,31 @@ int writeExternsFile(char* fileName, struct Extern* externHead, struct Symbol* s
 */
 int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead,
               struct Entry* entryHead, struct Extern* externHead) {
-    // Conduct full file path
+    /* Conduct full file path */
     int ICCopy = MEMORY_START;
 
-    // Iteration helper:
+    /* Iteration helper: */
     int i;
+    char* externName, *symbolName, *new_file_path, *ICSpecialB32, *lineSpecialB32;
     struct DecodedLine* linePointer = decodedLineHead;
-
-    struct Extern* externPointer = externHead;
-    // Getting the first valuable Extern object
+    struct Extern* externPointer = externHead, *externObject;
+    struct Entry* entryPointer;
+    struct Symbol* symbol, *symbolPointer;
+    FILE *file_writer_pointer;
+    /* Getting the first valuable Extern object */
     while (externPointer != NULL && (!strcmp(externPointer->name, EMPTY_STRUCT_NAME)))
         externPointer = externPointer->next;
 
-    // Verifying our externs are not already-defined symbols/entries, they should be defined in some other files:
+    /* Verifying our externs are not already-defined symbols/entries, they should be defined in some other files: */
     while(externPointer != NULL) {
-        char* externName = externPointer->name;
-        struct Entry* entryPointer = getEntry(entryHead, externName);
+        externName = externPointer->name;
+        entryPointer = getEntry(entryHead, externName);
         if (entryPointer != NULL) {
             printf("Error! Can't define extern and entry with the same name. Entry defined in line %d, "
                    "Extern defined in line %d\n", entryPointer->lineNum, externPointer->lineNum);
             return 0;
         }
-        struct Symbol* symbolPointer = getSymbol(symbolHead, externName);
+        symbolPointer = getSymbol(symbolHead, externName);
         if (symbolPointer != NULL) {
             printf("Error! Can't define extern and symbol with the same name. Symbol defined in line %d, "
                    "Extern defined in line %d\n", symbolPointer->lineNum, externPointer->lineNum);
@@ -219,29 +226,33 @@ int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* de
         externPointer = externPointer->next;
     }
 
-    // Getting the first valuable DecodedLine object
+    /* Getting the first valuable DecodedLine object */
     while (linePointer != NULL && linePointer->isEmpty == 1)
         linePointer = linePointer->next;
 
-    // Replacing all <TO_BE_FILLED> lines with the real value, after retrieving all symbols in previous stages
+    /* Replacing all <TO_BE_FILLED> lines with the real value, after retrieving all symbols in previous stages */
     while (linePointer != NULL) {
         for (i=1; i < 5; i++) {
             if (linePointer->binaryValue[i] != NULL && !strcmp(linePointer->binaryValue[i], TO_BE_FILLED)) {
-                char* symbolName = (char*)malloc(sizeof(char));
-                if (0 < i && i < 3)
-                    // Index for source operand
+                symbolName = (char*)malloc(sizeof(char));
+                if (0 < i && i < 3) {
+                    /* Index for source operand */
                     symbolName = strcpy(symbolName, linePointer->srcOperandName);
-                else
-                    // Index for target operand
+                    printf("Source operand name is %s\n", linePointer->srcOperandName);
+                }
+                else {
+                    /* Index for target operand */
                     symbolName = strcpy(symbolName, linePointer->tgtOperandName);
-                // Extracting extension of struct addressing if relevant
+                    printf("Target operand name is %s\n", linePointer->tgtOperandName);
+                }
+                printf("symbol name is %s\n", symbolName);
+                /* Extracting extension of struct addressing if relevant */
                 if (!strcmp(symbolName + strlen(symbolName) - 2, ".1") ||
                     !strcmp(symbolName + strlen(symbolName) - 2, ".2"))
                     symbolName[strlen(symbolName) - 2] = '\0';
-                struct Symbol* symbol = getSymbol(symbolHead, symbolName);
-                struct Extern* externObject;
+                symbol = getSymbol(symbolHead, symbolName);
                 if(!symbol) {
-                    // If it was not found in the Symbols list, it should be found in the Externs list
+                    /* If it was not found in the Symbols list, it should be found in the Externs list */
                     externObject = getExtern(externHead, symbolName);
                     if (!externObject) {
                         printf("Error! Symbol %s used in line %d is not declared anywhere\n",
@@ -251,10 +262,10 @@ int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* de
                 }
                 linePointer->binaryValue[i] = (char*)calloc(BINARY_WORD_SIZE, sizeof(char));
                 if (!symbol && externObject != NULL)
-                    // If it's an extern, fill line accordingly
+                    /* If it's an extern, fill line accordingly */
                     strcpy(linePointer->binaryValue[i], "0000000001");
                 else {
-                    // If it's a symbol, fill the line according to the symbol value
+                    /* If it's a symbol, fill the line according to the symbol value */
                     strcpy(linePointer->binaryValue[i], decToBinary(symbol->value,
                                                                     BINARY_WORD_SIZE - 2));
                     strcat(linePointer->binaryValue[i], "10");
@@ -264,39 +275,38 @@ int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* de
         linePointer = linePointer->next;
     }
 
-    // Writing entries file
+    /* Writing entries file */
     if (!writeEntriesFile(file_name, entryHead, symbolHead)) {
         printf("Error! Couldn't write entries file\n");
         return 0;
     }
 
-    // Writing externs file
+    /* Writing externs file */
     if (!writeExternsFile(file_name, externHead, symbolHead, decodedLineHead)) {
         printf("Error! Couldn't write entries file\n");
         return 0;
     }
 
     linePointer = decodedLineHead;
-    // Getting the first valuable DecodedLine object
+    /* Getting the first valuable DecodedLine object */
     while (linePointer != NULL && linePointer->isEmpty == 1)
         linePointer = linePointer->next;
 
-    FILE *file_writer_pointer;
-    char* new_file_path = (char*)malloc(strlen(file_name) + strlen(PRE_PROCESSING_FILE_EXTENSION));
+    new_file_path = (char*)malloc(strlen(file_name) + strlen(PRE_PROCESSING_FILE_EXTENSION));
     strcpy(new_file_path, file_name);
-    strncat(new_file_path, OBJECT_FILE_EXTENSION, strlen(OBJECT_FILE_EXTENSION));
+    strcat(new_file_path, OBJECT_FILE_EXTENSION);
     file_writer_pointer = fopen(new_file_path,"w");
 
-    // Iterating through the decoded lines list, and printing to the objects file, the machine code according to the
-    // unique 32' base
+    /* Iterating through the decoded lines list, and printing to the objects file, the machine code according to the */
+    /* unique 32' base */
     while (linePointer != NULL) {
         int linesCount = 0, i = 0;
         while (linesCount < linePointer->length) {
-            // Iterate through the decoded line binary values, and if it's not null, change it to base32 and
-            // print to file
+            /* Iterate through the decoded line binary values, and if it's not null, change it to base32 and */
+            /* print to file */
             if (linePointer->binaryValue[i] != NULL) {
-                char* ICSpecialB32 = binToSpecialB32(decToBinary(ICCopy, 8));
-                char* lineSpecialB32 = binToSpecialB32(linePointer->binaryValue[i]);
+                ICSpecialB32 = binToSpecialB32(decToBinary(ICCopy, 8));
+                lineSpecialB32 = binToSpecialB32(linePointer->binaryValue[i]);
                 fprintf(file_writer_pointer, "%s %s\n", ICSpecialB32, lineSpecialB32);
                 ICCopy++;
                 linesCount++;

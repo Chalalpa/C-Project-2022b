@@ -26,12 +26,12 @@ int doesLabelExist(char* labelName, struct Symbol* head) {
    (that are separated by commas).
 */
 char** getOperands(char* trimmedLine, int operandsLimit) {
-    int operandsCount = 0;
-    char** operands = (char**)calloc(operandsLimit + 1, MAX_LINE_LEN * sizeof(char));
-    char* trimmedLinePointer = trimmedLine;
+    int operandsCount = 0, i;
+    char* trimmedLinePointer = trimmedLine, * operand, * operandPointer, ** operands;
+    operands = (char**)calloc(operandsLimit + 1, MAX_LINE_LEN * sizeof(char));
     while(*trimmedLinePointer && operandsCount <= operandsLimit + 1) {
-        char* operand = (char *)calloc(strlen(trimmedLine) + 1, sizeof(char));
-        char* operandPointer = operand;
+        operand = (char *)calloc(strlen(trimmedLine) + 1, sizeof(char));
+        operandPointer = operand;
         while (*trimmedLinePointer && *trimmedLinePointer != ',') {
             if (*trimmedLinePointer != '\n')
                 *operandPointer++ = *trimmedLinePointer;
@@ -42,7 +42,6 @@ char** getOperands(char* trimmedLine, int operandsLimit) {
         if (*trimmedLinePointer && *trimmedLinePointer == ',')
             trimmedLinePointer++;
     }
-    int i;
     for (i = 0; i < operandsCount; i++)
         strcpy(operands[i], removeLeadingWhiteSpaces(removeEndingWhiteSpaces(operands[i])));
     return operands;
@@ -59,22 +58,26 @@ char** getOperands(char* trimmedLine, int operandsLimit) {
 */
 struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data) {
     struct Directive* directivePointer = getDirectiveByName(directiveName);
+    struct DecodedLine* decoded;
+    struct Directive directive;
+    int operandsCount, i;
+    char* trimmedLine, **operands, *firstWord, *string;
     if (!directivePointer) {
         printf("Error! Wrong directive was provided: %s\n", line_data);
         return 0;
     }
-    struct DecodedLine* decoded = (struct DecodedLine*)malloc(sizeof(struct DecodedLine));
+    decoded = (struct DecodedLine*)malloc(sizeof(struct DecodedLine));
     decoded->next = NULL;
     decoded->srcOperandName = NULL;
     decoded->tgtOperandName = NULL;
-    struct Directive directive = *directivePointer;
-    char* trimmedLine = removeEndingWhiteSpaces(removeLeadingWhiteSpaces(line_data));
+    directive = *directivePointer;
+    trimmedLine = removeEndingWhiteSpaces(removeLeadingWhiteSpaces(line_data));
     trimmedLine += strlen(directiveName);
     trimmedLine = removeEndingWhiteSpaces(removeLeadingWhiteSpaces(trimmedLine));
-    if (!strcmp(directiveName, DATA)) {  // .data directive
+    if (!strcmp(directiveName, DATA)) {  /* .data directive */
         decoded->binaryValue = (char**)calloc(directive.maxOperandsNum + 1, (BINARY_WORD_SIZE + 1) * sizeof(char));
-        char** operands = getOperands(trimmedLine, directive.maxOperandsNum);
-        int operandsCount = 0;
+        operands = getOperands(trimmedLine, directive.maxOperandsNum);
+        operandsCount = 0;
         while(operands[operandsCount]) {
             if(isValidNumber(operands[operandsCount])) {
                 decoded->binaryValue[operandsCount] = (char*)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
@@ -103,7 +106,6 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
             printf("Error! found an invalid string under %s data directive declaration: %s\n", STRING, line_data);
             return 0;
         }
-        int i;
         for (i = 1; i < strlen(trimmedLine) - 1; i++) {
             decoded->binaryValue[i - 1] = (char*)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
             strcpy(decoded->binaryValue[i - 1], decToBinary((int)(trimmedLine[i]), 10));
@@ -114,14 +116,14 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
         return decoded;
     }
     if (!strcmp(directiveName, STRUCT)) {
-        char **operands = getOperands(trimmedLine, 1);
+        operands = getOperands(trimmedLine, 1);
         if (!isValidNumber(operands[0])) {
             printf("Error! first operand of %s data directive must be valid number: %s\n", STRUCT,
                    line_data);
             free(operands);
             return 0;
         }
-        char* firstWord = (char *) calloc(BINARY_WORD_SIZE + 1, sizeof(char));
+        firstWord = (char *) calloc(BINARY_WORD_SIZE + 1, sizeof(char));
         strcpy(firstWord, decToBinary(atoi(operands[0]), 10));
         trimmedLine += strlen(operands[0]);
         trimmedLine = removeLeadingWhiteSpaces(trimmedLine);
@@ -136,7 +138,7 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
             free(operands);
             return 0;
         }
-        char *string = (char *)calloc(strlen(trimmedLine), sizeof(char));
+        string = (char *)calloc(strlen(trimmedLine) + 1, sizeof(char));
         strncpy(string, trimmedLine, strlen(trimmedLine));
         string[strlen(trimmedLine)] = '\0';
         if (!isValidString(string)) {
@@ -149,8 +151,7 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
         decoded->binaryValue = (char**)calloc(decoded->length + 1, (BINARY_WORD_SIZE + 1) * sizeof(char));
         decoded->binaryValue[0] = (char *) calloc(BINARY_WORD_SIZE + 1, sizeof(char));
         strcpy(decoded->binaryValue[0], firstWord);
-        // Skip the '"'
-        int i;
+        /* Skip the '"' */
         for (i = 1; i < strlen(string) - 1; i++) {
             decoded->binaryValue[i] = (char *) calloc(BINARY_WORD_SIZE + 1,
                                                           sizeof(char));
@@ -159,7 +160,7 @@ struct DecodedLine* decodeDataDirectiveLine(char* directiveName, char* line_data
         decoded->binaryValue[i] = (char *) calloc(BINARY_WORD_SIZE + 1,
                                                       sizeof(char));
         strcpy(decoded->binaryValue[i], decToBinary((int)(0), 10));
-        trimmedLine += strlen(string) - 1;  // Skip the string and the '"' char at the end
+        trimmedLine += strlen(string) - 1;  /* Skip the string and the '"' char at the end */
         if(*trimmedLine) {
             printf("Error! Found trailing spaces after struct declaration: %s\n", line_data);
             free(operands);
@@ -196,10 +197,13 @@ int getDecodedLineLength(struct DecodedLine* line) {
    If the decoding was successful, the function will return a new DecodedLine* object with the relevant data.
 */
 struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_data) {
+    char *leftTrimmedLine, *current, **operands, *srcRegisterCode, *labelName, *binaryRegisterNumber;
+    struct DecodedLine* decoded;
+    int operandsCount = 0, i, sourceOperand, indexAddressing, binaryNumberLineIndex, registerNumber;
     if (isCommentLine(line_data) || isEmptyLine(line_data))
         return 0;
-    char *leftTrimmedLine = removeLeadingWhiteSpaces(line_data);
-    char* current = (char*)calloc(4, sizeof(char));
+    leftTrimmedLine = removeLeadingWhiteSpaces(line_data);
+    current = (char*)calloc(4, sizeof(char));
     while(*(leftTrimmedLine + 2)) {
         strncpy(current, leftTrimmedLine, 3);
         if (!strcmp(operation.name, current))
@@ -207,14 +211,13 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
         leftTrimmedLine++;
     }
     if(!*(leftTrimmedLine + 2)) {
-        // If we couldn't find the operation
+        /* If we couldn't find the operation */
         printf("Could not find operation %s in line %s:\n", operation.name, line_data);
         return 0;
     }
     leftTrimmedLine += 3;
     leftTrimmedLine = removeLeadingWhiteSpaces(leftTrimmedLine);
-    char** operands = getOperands(leftTrimmedLine, 2);
-    int operandsCount = 0, i;
+    operands = getOperands(leftTrimmedLine, 2);
     for (i=0; i<3; i++) {
         if (operands[i] != 0) {
             if(containsSpace(operands[i])) {
@@ -241,19 +244,21 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
         if (isKeyword(operands[i]) && !isRegister(operands[i]))
             printf("Error! keyword (that is not a register) cannot be used as an operand: %s\n", line_data);
 
-    struct DecodedLine* decoded = (struct DecodedLine*)malloc(sizeof(struct DecodedLine*));
+    decoded = (struct DecodedLine*)malloc(sizeof(struct DecodedLine*));
+    decoded->binaryValue = (char**)calloc(5, (BINARY_WORD_SIZE + 1) * sizeof(char));
+    for (i = 0; i < 5; i++) {
+        decoded->binaryValue[i] = (char*)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
+    }
     decoded->next = NULL;
-    decoded->binaryValue = (char**)calloc(6, (BINARY_WORD_SIZE + 1) * sizeof(char));
-    decoded->binaryValue[0] = (char*)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
     strncpy(decoded->binaryValue[0], operation.binaryCode, 4);
     if (operandsCount == 0) {
         strcat(decoded->binaryValue[0], "000000");
         decoded->srcOperandName = 0;
         decoded->tgtOperandName = 0;
-        // All lines except first shouldn't be filled
+        /* All lines except first shouldn't be filled */
         for(i=1; i<5; i++)
             decoded->binaryValue[i] = NULL;
-        // Finished decoding the line
+        /* Finished decoding the line */
         decoded->length = 1;
         free(operands);
         return decoded;
@@ -263,21 +268,28 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
         decoded->srcOperandName = 0;
         decoded->tgtOperandName = (char*)calloc(strlen(operands[0]) + 1, sizeof(char));
         strcpy(decoded->tgtOperandName, operands[0]);
-        // Lines 1 and 2 shouldn't be filled (Starting from 0)
+        decoded->tgtOperandName = realloc(decoded->tgtOperandName, strlen(decoded->tgtOperandName) + 1);
+        decoded->tgtOperandName[strlen(decoded->tgtOperandName)] = '\0';
+        /* Lines 1 and 2 shouldn't be filled (Starting from 0) */
         for(i=1; i<3; i++)
             decoded->binaryValue[i] = NULL;
     }
     else {
         decoded->srcOperandName = (char*)calloc(strlen(operands[0]) + 1, sizeof(char));
         strcpy(decoded->srcOperandName, operands[0]);
+        decoded->srcOperandName = realloc(decoded->srcOperandName, strlen(decoded->srcOperandName) + 1);
+        decoded->srcOperandName[strlen(decoded->srcOperandName)] = '\0';
         decoded->tgtOperandName = (char*)calloc(strlen(operands[1]) + 1, sizeof(char));
         strcpy(decoded->tgtOperandName, operands[1]);
+        decoded->tgtOperandName = realloc(decoded->tgtOperandName, strlen(decoded->tgtOperandName) + 1);
+        decoded->tgtOperandName[strlen(decoded->tgtOperandName)] = '\0';
+        printf("Target operand name is %s\n", decoded->tgtOperandName);
     }
     for (i=0; i<operandsCount; i++) {
-        int sourceOperand = 0;
+        sourceOperand = 0;
         if (operandsCount == 2 && i == 0)
-            sourceOperand = 1;  // Current operand that we are looking at is the source operand
-        int indexAddressing = getAddressingIndex(operands[i]);  //S3.1 for example
+            sourceOperand = 1;  /* Current operand that we are looking at is the source operand */
+        indexAddressing = getAddressingIndex(operands[i]);  /* S3.1 for example */
         if (startsWith(operands[i], "#")) {
             if (!isValidNumber(operands[i] + 1)) {
                 printf("Error! Expected a number after '#' sign: %s\n", line_data);
@@ -286,7 +298,7 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
             }
             else {
                 if (sourceOperand) {
-                    if (!operation.sourceAddressingMethods.immediate) {  // 00
+                    if (!operation.sourceAddressingMethods.immediate) {  /* 00 */
                         printf("Error! operation %s does not support direct addressing from source: %s\n",
                                operation.name, line_data);
                         free(operands);
@@ -302,19 +314,18 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
 
                 }
                 strcat(decoded->binaryValue[0], "00");
-                int binaryNumberLineIndex;
                 if (sourceOperand)
                     binaryNumberLineIndex = 1;
                 else
                     binaryNumberLineIndex = 3;
-                decoded->binaryValue[binaryNumberLineIndex] = (char*)calloc(BINARY_WORD_SIZE, sizeof(char));
+                /* decoded->binaryValue[binaryNumberLineIndex] = (char*)calloc(BINARY_WORD_SIZE + 1, sizeof(char));*/
                 strcpy(decoded->binaryValue[binaryNumberLineIndex], decToBinary(atoi(operands[i] + 1), 8));
-                strcat(decoded->binaryValue[binaryNumberLineIndex], "00");  // A,R,E
+                strcat(decoded->binaryValue[binaryNumberLineIndex], "00");  /* A,R,E */
             }
         }
         else if (isRegister(operands[i])) {
             if (sourceOperand) {
-                if (!operation.sourceAddressingMethods.reg) {  // 11
+                if (!operation.sourceAddressingMethods.reg) {  /* 11 */
                     printf("Error! operation %s does not support reg addressing from source: %s\n",
                            operation.name, line_data);
                     free(operands);
@@ -326,26 +337,26 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
                 free(operands);
                 return 0;
             }
-            int registerNumber = atoi(operands[i] + 1);
-            char* binaryRegisterNumber = decToBinary(registerNumber, 4);
+            registerNumber = atoi(operands[i] + 1);
+            binaryRegisterNumber = decToBinary(registerNumber, 4);
             if(sourceOperand) {
-                decoded->binaryValue[1] = (char*)calloc(BINARY_WORD_SIZE, sizeof(char));
+                decoded->binaryValue[1] = (char*)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
                 strcpy(decoded->binaryValue[1], binaryRegisterNumber);
                 strcat(decoded->binaryValue[1], "0000");
                 strcat(decoded->binaryValue[1], "00");
             }
             else {
                 if (operandsCount > 1 && (isRegister(operands[i-1]))) {
-                    char* srcRegisterCode = (char*)calloc(4, sizeof(char));
+                    srcRegisterCode = (char*)calloc(4, sizeof(char));
                     strncpy(srcRegisterCode, decoded->binaryValue[1], 4);
                     srcRegisterCode[4] = '\0';
-                    decoded->binaryValue[1] = (char*)calloc(BINARY_WORD_SIZE, sizeof(char));
+                    decoded->binaryValue[1] = (char*)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
                     strcpy(decoded->binaryValue[1], srcRegisterCode);
                     strcat(decoded->binaryValue[1], binaryRegisterNumber);
                     strcat(decoded->binaryValue[1], "00");
                 }
                 else {
-                    decoded->binaryValue[3] = (char*)calloc(BINARY_WORD_SIZE, sizeof(char));
+                    decoded->binaryValue[3] = (char*)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
                     strcpy(decoded->binaryValue[3], "0000");
                     strcat(decoded->binaryValue[3], binaryRegisterNumber);
                     strcat(decoded->binaryValue[3], "00");
@@ -354,7 +365,7 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
             strcat(decoded->binaryValue[0], "11");
         }
         else if (indexAddressing != 0){
-            char* labelName = (char*)calloc(MAX_LABEL_LEN, sizeof(char));
+            labelName = (char*)calloc(MAX_LABEL_LEN + 1, sizeof(char));
             strncpy(labelName, operands[i], strlen(operands[i]));
             labelName[strlen(operands[i])- strlen(".1")] = '\0';
             if (!isValidLabel(labelName)) {
@@ -363,7 +374,7 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
                 return 0;
             }
             if (sourceOperand) {
-                if (!operation.sourceAddressingMethods.index) {  // 10
+                if (!operation.sourceAddressingMethods.index) {  /* 10 */
                     printf("Error! operation %s does not support index addressing from source: %s\n",
                            operation.name, line_data);
                     free(operands);
@@ -375,21 +386,20 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
                 free(operands);
                 return 0;
             }
-            int binaryNumberLineIndex;
             if (sourceOperand)
                 binaryNumberLineIndex = 1;
             else
                 binaryNumberLineIndex = 3;
-            decoded->binaryValue[binaryNumberLineIndex] = (char*)calloc(BINARY_WORD_SIZE, sizeof(char));
+            decoded->binaryValue[binaryNumberLineIndex] = (char*)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
             strcpy(decoded->binaryValue[binaryNumberLineIndex], TO_BE_FILLED);
-            decoded->binaryValue[binaryNumberLineIndex + 1] = (char*)calloc(BINARY_WORD_SIZE, sizeof(char));
+            decoded->binaryValue[binaryNumberLineIndex + 1] = (char*)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
             strcpy(decoded->binaryValue[binaryNumberLineIndex + 1], decToBinary(indexAddressing, 8));
             strcat(decoded->binaryValue[binaryNumberLineIndex + 1], "00");
             strcat(decoded->binaryValue[0], "10");
         }
         else {
             if (sourceOperand) {
-                if (!operation.sourceAddressingMethods.direct) {  // 01
+                if (!operation.sourceAddressingMethods.direct) {  /* 01 */
                     printf("Error! operation %s does not support direct addressing from source: %s\n",
                            operation.name, line_data);
                     free(operands);
@@ -401,17 +411,16 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
                 free(operands);
                 return 0;
             }
-            int binaryNumberLineIndex;
             if (sourceOperand)
                 binaryNumberLineIndex = 1;
             else
                 binaryNumberLineIndex = 3;
-            decoded->binaryValue[binaryNumberLineIndex] = (char*)calloc(BINARY_WORD_SIZE, sizeof(char));
+            decoded->binaryValue[binaryNumberLineIndex] = (char*)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
             strcpy(decoded->binaryValue[binaryNumberLineIndex], TO_BE_FILLED);
             strcat(decoded->binaryValue[0], "01");
         }
     }
-    // A,R,E code of first line should always be 00 in such case
+    /* A,R,E code of first line should always be 00 in such case */
     decoded->binaryValue[0][BINARY_WORD_SIZE - 2] = '0';
     decoded->binaryValue[0][BINARY_WORD_SIZE - 1] = '0';
     decoded->length = getDecodedLineLength(decoded);
@@ -436,39 +445,41 @@ struct DecodedLine* decodeOperationLine(struct Operation operation, char* line_d
 */
 int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead,
              struct Entry* entryHead, struct Extern* externHead) {
-    // Conduct full file path
-    char* full_file_path = (char*)calloc(strlen(file_name) + strlen(PRE_PROCESSING_FILE_EXTENSION)
+    /* Conduct full file path */
+    char* full_file_path, line_data[MAX_LINE_LEN + 3], *labelFirstField, *name, *trailingChars, * labelName;
+    struct Symbol* symbolHeadPointer = symbolHead;
+    struct Symbol* tmpSymbol;
+    struct DecodedLine* decodedLine;
+    struct Operation operation;
+    struct Extern* externTmp;
+    struct Entry* entryTmp;
+    int i = 0, isLabel, operationIndex;
+    FILE *file_pointer;
+    full_file_path = (char*)calloc(strlen(file_name) + strlen(PRE_PROCESSING_FILE_EXTENSION)
             ,sizeof(char));
     strcpy(full_file_path, file_name);
-    strncat(full_file_path, PRE_PROCESSING_FILE_EXTENSION, strlen(PRE_PROCESSING_FILE_EXTENSION));
-    FILE *file_pointer;
+    strcat(full_file_path, PRE_PROCESSING_FILE_EXTENSION);
 
-    // Verifying file exists
+    /* Verifying file exists */
     if (access(full_file_path, F_OK) != 0) {
         printf("No such file: '%s'\n", full_file_path);
         return 0;
     }
 
-    // Verifying file is reachable
+    /* Verifying file is reachable */
     file_pointer = fopen(full_file_path, "r");
     if (file_pointer == NULL) {
         printf("Error reading given file '%s'\n", full_file_path);
         return 0;
     }
 
-    // We initialize it with + 3, to ensure we have space for \n, for the '\0' char,
-    // and for another potential char (to verify we don't exceed from max line length limit)
-    char line_data[MAX_LINE_LEN + 3];
+    /* We initialize it with + 3, to ensure we have space for \n, for the '\0' char,
+       and for another potential char (to verify we don't exceed from max line length limit) */
     memset(line_data, '\0', MAX_LINE_LEN + 3);
 
-    // Iteration helper:
-    struct Symbol* symbolHeadPointer = symbolHead;
-    struct Symbol* tmpSymbol;
-    int i = 0, isLabel;
-
     while(fgets(line_data, MAX_LINE_LEN + 3, file_pointer)) {
-        // Handling general edge cases:
-        if (strlen(line_data) > MAX_LINE_LEN + 1) {  // Including the \n char
+        /* Handling general edge cases: */
+        if (strlen(line_data) > MAX_LINE_LEN + 1) {  /* Including the \n char */
             printf("Error! Line %d of file %s exceeds line length limit (%d)\n",
                    i + 1, full_file_path, MAX_LINE_LEN);
             return 0;
@@ -486,9 +497,9 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
         }
 
         isLabel = 0;
-        char* labelName = getLabelName(line_data);
+        labelName = getLabelName(line_data);
         if (labelName) {
-            // If a valid label was found, turn on proper flag
+            /* If a valid label was found, turn on proper flag */
             isLabel = 1;
             if (doesLabelExist(labelName, symbolHeadPointer)) {
                 printf("Error! Label with this name was already initialized earlier in the file, err line %d: %s\n",
@@ -498,31 +509,31 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
         }
         else
             labelName = "";
-        // Initialize Symbol struct
+        /* Initialize Symbol struct */
         tmpSymbol = NULL;
         tmpSymbol = (struct Symbol*)malloc(sizeof(struct Symbol));
         tmpSymbol->next = NULL;
-        tmpSymbol->name = (char*)calloc(strlen(labelName), sizeof(char));
+        tmpSymbol->name = (char*)calloc(strlen(labelName) + 1, sizeof(char));
         tmpSymbol->lineNum = i + 1;
         strcpy(tmpSymbol->name, labelName);
 
 
-        char* labelFirstField = getNextField(removeLeadingWhiteSpaces(line_data) + strlen(labelName));
+        labelFirstField = getNextField(removeLeadingWhiteSpaces(line_data) + strlen(labelName));
         if (!labelFirstField) {
             printf("Error! No content after label declaration in line %d: %s", i + 1, line_data);
             return 0;
         }
         if (isDirective(labelFirstField)) {
-            // Handling directives
+            /* Handling directives */
             if (isDataDirective(labelFirstField)) {
-                // Handling data directives
-                tmpSymbol->type = (char*)calloc(strlen(DATA_DIRECTIVE), sizeof(char));
+                /* Handling data directives */
+                tmpSymbol->type = (char*)calloc(strlen(DATA_DIRECTIVE) + 1, sizeof(char));
                 tmpSymbol->type = DATA_DIRECTIVE;
                 tmpSymbol->value = *IC;
-                struct DecodedLine* decodedLine = decodeDataDirectiveLine(labelFirstField,
+                decodedLine = decodeDataDirectiveLine(labelFirstField,
                         line_data + strlen(labelName) + 1);
                 if (decodedLine != 0) {
-                    // If line was encoded correctly, add it to decoded objects list
+                    /* If line was encoded correctly, add it to decoded objects list */
                     decodedLine->value = *IC;
                     *DC += decodedLine->length;
                     decodedLineHead->next = decodedLine;
@@ -535,9 +546,9 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
                 }
 
             } else if (isExternOrEntryDirective(labelFirstField)) {
-                // Ignore label, it's meaningless in this case
+                /* Ignore label, it's meaningless in this case */
                 tmpSymbol = NULL;
-                char* name = getNextField(
+                name = getNextField(
                         line_data + strlen(labelName) + strlen(labelFirstField));
                 if (name == 0) {
                     printf("Error! There must be a name attached to %s directives in line %d: %s\n",
@@ -549,7 +560,7 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
                            labelFirstField, i + 1, line_data);
                     return 0;
                 }
-                char* trailingChars = removeLeadingWhiteSpaces(line_data);
+                trailingChars = removeLeadingWhiteSpaces(line_data);
                 trailingChars += strlen(labelFirstField);
                 trailingChars = removeLeadingWhiteSpaces(trailingChars);
                 trailingChars += strlen(name);
@@ -559,26 +570,26 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
                            line_data);
                     return 0;
                 }
-                // Entry/Extern is valid. Adding it to Entries/Externs and Symbols lists
+                /* Entry/Extern is valid. Adding it to Entries/Externs and Symbols lists */
                 tmpSymbol = (struct Symbol*)malloc(sizeof(struct Symbol));
                 tmpSymbol->next = NULL;
-                tmpSymbol->name = (char*)calloc(strlen(labelName), sizeof(char));
+                tmpSymbol->name = (char*)calloc(strlen(labelName) + 1, sizeof(char));
                 strcpy(tmpSymbol->name, name);
                 strcpy(tmpSymbol->name, name);
                 tmpSymbol->type = labelFirstField;
-                if(!strcmp(labelFirstField, EXTERN)) { // Check if it's an extern directive
-                    struct Extern* externTmp = (struct Extern*)malloc(sizeof(struct Extern));
+                if(!strcmp(labelFirstField, EXTERN)) { /* Check if it's an extern directive */
+                    externTmp = (struct Extern*)malloc(sizeof(struct Extern));
                     externTmp->lineNum = i + 1;
                     externTmp->next = NULL;
-                    externTmp->name = (char*)calloc(strlen(name), sizeof(char));
+                    externTmp->name = (char*)calloc(strlen(name) + 1, sizeof(char));
                     strcpy(externTmp->name, name);
                     externHead->next = externTmp;
                     externHead = externTmp;
                 }
                 else {
-                    struct Entry* entryTmp = (struct Entry*)malloc(sizeof(struct Entry));
+                    entryTmp = (struct Entry*)malloc(sizeof(struct Entry));
                     entryTmp->next = NULL;
-                    entryTmp->name = (char*)calloc(strlen(name), sizeof(char));
+                    entryTmp->name = (char*)calloc(strlen(name) + 1, sizeof(char));
                     entryTmp->lineNum = i + 1;
                     strcpy(entryTmp->name, name);
                     entryHead->next = entryTmp;
@@ -587,8 +598,8 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
             }
         }
         else {
-            // Handling operative sentence
-            tmpSymbol->type = (char*)calloc(strlen(CODE), sizeof(char));
+            /* Handling operative sentence */
+            tmpSymbol->type = (char*)calloc(strlen(CODE) + 1, sizeof(char));
             tmpSymbol->type = CODE;
             tmpSymbol->value = *IC;
             if (!isOperation(labelFirstField)) {
@@ -597,9 +608,9 @@ int firstRun(char* file_name, int* IC, int* DC, struct Symbol* symbolHead, struc
                 return 0;
             }
             else {
-                int operationIndex = getOperationIndex(labelFirstField);
-                struct Operation operation = OPERATIONS_TABLE[operationIndex];
-                struct DecodedLine* decodedLine = decodeOperationLine(operation, line_data);
+                operationIndex = getOperationIndex(labelFirstField);
+                operation = OPERATIONS_TABLE[operationIndex];
+                decodedLine = decodeOperationLine(operation, line_data);
                 if (decodedLine != 0) {
                     decodedLine->value = *IC;
                     decodedLine->lineNum = i + 1;

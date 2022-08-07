@@ -55,9 +55,10 @@ int freeExterns(struct Extern* externHead) {
 
 int main(int argc, char *argv[])
 {
-    int IC;  // Instruction counter
-    int DC; // Data counter
-    int i;
+    int IC;  /* Instruction counter */
+    int DC; /* Data counter */
+    int i, result;
+    char* fileName;
     struct Macro* macroHead = NULL;
     struct Symbol* symbolHead = NULL;
     struct DecodedLine* decodedLineHead = NULL;
@@ -69,7 +70,6 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    char* fileName;
     for (i = 0; i < argc; i++) {
         IC = MEMORY_START;
         DC = 0;
@@ -95,19 +95,19 @@ int main(int argc, char *argv[])
         externHead->next = NULL;
         fileName = argv[i];
         printf("==============Reading Macros===============\n");
-        int readResult = readMacros(argv[i], macroHead);
-        if (readResult) {
+        result = readMacros(argv[i], macroHead);
+        if (result) {
             printf("==============Writing Macros===============\n");
-            int writeResult = writeMacros(fileName, macroHead);
-            if (writeResult) {
+            result = writeMacros(fileName, macroHead);
+            if (result) {
                 printf("==============First Iteration===============\n");
-                int firstRunResult = firstRun(fileName, &IC, &DC, symbolHead, decodedLineHead, entryHead,
+                firstRun(fileName, &IC, &DC, symbolHead, decodedLineHead, entryHead,
                                               externHead);
-                if (firstRunResult == 1) {
+                if (result == 1) {
                     printf("==============Second Iteration===============\n");
-                    int secondRunResult = secondRun(fileName, symbolHead, decodedLineHead, entryHead,
+                    result = secondRun(fileName, symbolHead, decodedLineHead, entryHead,
                                                     externHead);
-                    if (secondRunResult)
+                    if (result)
                         printf("Successfully compiled file: %s\n", fileName);
                 }
             }

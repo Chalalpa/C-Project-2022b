@@ -2,6 +2,25 @@
 
 /* A common utils file, to store all kinds of abilities that might be re-used in the project */
 
+/* @ Function: char* strrev(char *str)
+   @ Arguments: char *str
+   n - string wished to be reversed
+   @ Description: The function calculates and returns reverse version of the given string.
+*/
+char* strrev(char *str)
+{
+    char *p1, *p2;
+    if (! str || ! *str)
+        return str;
+    for (p1 = str, p2 = str + strlen(str) - 1; p2 > p1; ++p1, --p2)
+    {
+        *p1 ^= *p2;
+        *p2 ^= *p1;
+        *p1 ^= *p2;
+    }
+    return str;
+}
+
 /* @ Function: char* decToBinary(int n, int len)
    @ Arguments: int n, int len
    n - the number wished to be translated to binary
@@ -12,10 +31,11 @@ char* decToBinary(int n, int len)
 {
     char* binaryNumber = (char*)calloc(len, sizeof(char));
     char* binaryNumberPointer = binaryNumber;
-    // Size of an integer is assumed to be <len> bits
-    for (int i = len - 1; i >= 0; i--) {
-        int k = n >> i; // right shift
-        if (k & 1) // helps us know the state of first bit
+    int i;
+    /* Size of an integer is assumed to be <len> bits */
+    for (i = len - 1; i >= 0; i--) {
+        int k = n >> i; /* right shift */
+        if (k & 1) /* helps us know the state of first bit */
             *binaryNumberPointer = '1';
         else
             *binaryNumberPointer = '0';
@@ -25,12 +45,12 @@ char* decToBinary(int n, int len)
     return binaryNumber;
 }
 
-/* @ Function: char* binToDec(char* n)
+/* @ Function: int binToDec(char* n)
    @ Arguments: char* n
    n - the number wished to be translated to decimal
    @ Description: The function calculates and returns the given binary number in a decimal base.
 */
-char* binToDec(char* n) {
+int binToDec(char* n) {
     int num = 0;
     double i = 0.0;
     char* numPointer = n + strlen(n) - 1;
@@ -70,21 +90,6 @@ char* binToSpecialB32(char* n)
     while (strlen(b32) < 2)
         *b32Pointer++ = SPECIAL_BASE32[0];
     b32 = strrev(b32);
-    /*
-    char* specialB32 = (char*)calloc(8, sizeof(char));
-    char* specialB32Pointer = specialB32;
-    while (*b32Pointer) {
-        int i = 0;
-        *specialB32Pointer = *b32Pointer;
-        while (!isdigit(*specialB32Pointer)) {
-            *specialB32Pointer -= 'a';
-            i++;
-        }
-        *specialB32Pointer = SPECIAL_BASE32[*specialB32Pointer - '0' + (i * 10)];
-        b32Pointer++;
-        specialB32Pointer++;
-    }
-    */
     return b32;
 }
 
@@ -183,8 +188,8 @@ int containsSpace(char* string) {
    @ Description: The function checks if the given 'string' parameter exists in the given array of string, returns
    1 if it does, and 0 if not.
 */
-int isStringInArray(char* string, char** arr) {
-    char** arrPointer = arr;
+int isStringInArray(char* string, const char** arr) {
+    const char** arrPointer = arr;
     while(*arrPointer && **arrPointer) {
         if(!strcmp(string, *arrPointer))
             return 1;
@@ -251,6 +256,7 @@ int isOperation(char* string) {
    It returns 1 if it is valid, and 0 if it's not.
 */
 int isValidLabelOrMacroName(char* string, char* objectName) {
+    char* string_copy;
     if (strlen(string) > MAX_LABEL_LEN) {
         printf("Error. %s name exceeds limit (%d): %s\n", objectName, MAX_LABEL_LEN, string);
         return 0;
@@ -261,7 +267,7 @@ int isValidLabelOrMacroName(char* string, char* objectName) {
         return 0;
     }
 
-    char* string_copy = string;
+    string_copy = string;
     while(*string_copy) {
         if (!(isalnum(*string_copy))) {
             printf("Error. Found non alpha-numeric char in %s's name declaration: %s\n", objectName, string);
@@ -313,6 +319,7 @@ int isValidLabel(char* string) {
 */
 int isValidNumber(char* string) {
     char* strPointer = string;
+    int num;
     if (*strPointer == '-' || *strPointer == '+')
         strPointer++;
     while(*strPointer)
@@ -321,7 +328,7 @@ int isValidNumber(char* string) {
     strPointer = string;
     if (*strPointer == '-' || *strPointer == '+')
         strPointer++;
-    int num = atoi(strPointer);
+    num = atoi(strPointer);
     if (num > 256)
         return 0;
     return 1;
@@ -334,11 +341,11 @@ int isValidNumber(char* string) {
    Returns 1 if it is, and 0 if it's not.
 */
 int isValidString(char* string) {
+    int i;
     if (*string != '"')
         return 0;
     if (*(string + strlen(string) - 1) != '"')
         return 0;
-    int i;
     for (i=1; i < strlen(string) - 1; i++) {
         if(string[i] == '"')
             return 0;
@@ -369,31 +376,31 @@ int getAddressingIndex(char* string) {
    It returns 0 if the label is invalid or no label was found.
 */
 char* getLabelName(char* line_data) {
-    if (isCommentLine(line_data) || isEmptyLine(line_data))
-        return 0;
     char *leftTrimmedLine = removeLeadingWhiteSpaces(line_data);
     char *labelName = (char *) calloc(strlen(leftTrimmedLine) + 1, sizeof(char));
     char *labelNamePointer = labelName;
+    if (isCommentLine(line_data) || isEmptyLine(line_data))
+        return 0;
     while (*leftTrimmedLine && !isspace(*leftTrimmedLine) && *leftTrimmedLine != ':') {
         *labelNamePointer = *leftTrimmedLine;
         labelNamePointer++;
         leftTrimmedLine++;
     }
     if (!*leftTrimmedLine || isspace(*leftTrimmedLine)) {
-        // No ':' found until first space
+        /* No ':' found until first space */
         return 0;
     }
-    // We found ':'
+    /* We found ':' */
     if(!isspace(*(leftTrimmedLine + 1))) {
-        // if the next char after the ':' is not a whitespace, it's not a legal label
+        /* if the next char after the ':' is not a whitespace, it's not a legal label */
         printf("Found trailing chars after label's declaration, expected a whitespace: %s\n", line_data);
         return 0;
     }
     *labelNamePointer = '\0';
-    realloc(labelName, strlen(labelName) + 1);
+    labelName = realloc(labelName, strlen(labelName) + 1);
     if(isValidLabel(labelName))
         return labelName;
-    // If label is not valid, the function should print the exact reason
+    /* If label is not valid, the function should print the exact reason */
     return 0;
 
 }
@@ -406,11 +413,12 @@ char* getLabelName(char* line_data) {
 */
 char* getNextField(char* line_data) {
     char* lineDataPointer = removeLeadingWhiteSpaces(removeEndingWhiteSpaces(line_data));
-    if (lineDataPointer[0] == ':') // Including the ':' sign
+    char* fieldName, *fieldNamePointer;
+    if (lineDataPointer[0] == ':') /* Including the ':' sign */
         lineDataPointer++;
     lineDataPointer = removeLeadingWhiteSpaces(lineDataPointer);
-    char *fieldName = (char *)calloc(strlen(lineDataPointer) + 1, sizeof(char));
-    char *fieldNamePointer = fieldName;
+    fieldName = (char *)calloc(strlen(lineDataPointer) + 1, sizeof(char));
+    fieldNamePointer = fieldName;
     while (*lineDataPointer && !isspace(*lineDataPointer)) {
         *fieldNamePointer = *lineDataPointer;
         fieldNamePointer++;

@@ -8,9 +8,10 @@
    Returns 1 if it is, 0 if not. A macro start definition should be something like "macro <macro_name>"
 */
 int isMacroStart(char * line_data) {
+    char* leftTrimmedLine;
     if (isCommentLine(line_data) || isEmptyLine(line_data))
         return 0;
-    char* leftTrimmedLine = removeLeadingWhiteSpaces(line_data);
+    leftTrimmedLine = removeLeadingWhiteSpaces(line_data);
     return startsWith(leftTrimmedLine, MACRO_START);
 }
 
@@ -21,9 +22,10 @@ int isMacroStart(char * line_data) {
    Returns 1 if it is, 0 if not. A macro definition end should just be "endmacro"
 */
 int isMacroEnd(char * line_data) {
+    char* leftTrimmedLine;
     if (isCommentLine(line_data) || isEmptyLine(line_data))
         return 0;
-    char* leftTrimmedLine = removeLeadingWhiteSpaces(line_data);
+    leftTrimmedLine = removeLeadingWhiteSpaces(line_data);
     if(!startsWith(leftTrimmedLine, MACRO_END))
         return 0;
     leftTrimmedLine += strlen(MACRO_END);
@@ -39,15 +41,15 @@ int isMacroEnd(char * line_data) {
 */
 
 char* parseMacroName(char * line_data) {
-    char* leftTrimmedLine = removeLeadingWhiteSpaces(line_data);
+    char* leftTrimmedLine = removeLeadingWhiteSpaces(line_data), * macroName, * macroNamePointer;
     leftTrimmedLine += strlen(MACRO_START);
-    if (*leftTrimmedLine != ' ') { // Should be a single space after macro def start
+    if (*leftTrimmedLine != ' ') { /* Should be a single space after macro def start */
         printf("Error. Expected a space after macro keyword. Line data: %s\n", line_data);
         return 0;
     }
     leftTrimmedLine++;
-    char * macroName = (char*)malloc(strlen(leftTrimmedLine) + 1);
-    char * macroNamePointer = macroName;
+    macroName = (char*)malloc(strlen(leftTrimmedLine) + 1);
+    macroNamePointer = macroName;
     while (*leftTrimmedLine && !isspace(*leftTrimmedLine)) {
         *macroNamePointer = *leftTrimmedLine;
         macroNamePointer++;
@@ -60,10 +62,10 @@ char* parseMacroName(char * line_data) {
         }
     }
     *macroNamePointer = '\0';
-    realloc(macroName, strlen(macroName) + 1);
+    macroName = realloc(macroName, strlen(macroName) + 1);
 
     if(!isValidMacro(macroName))
-        return 0; // the isValidMacro function should print the relevant error if occurs
+        return 0; /* the isValidMacro function should print the relevant error if occurs */
 
     return macroName;
 }
@@ -77,29 +79,30 @@ char* parseMacroName(char * line_data) {
    to the existing ones in the macros list.
 */
 char* isMacroCall(char* line_data, struct Macro* head) {
-    if (isCommentLine(line_data) || isEmptyLine(line_data))
-        return 0;
-    char* leftTrimmedLine = removeLeadingWhiteSpaces(line_data);
-    char* macroName = (char*)calloc(strlen(leftTrimmedLine) + 1, sizeof(char));
+    char* leftTrimmedLine = removeLeadingWhiteSpaces(line_data), * macroName, * macroNamePointer;
     struct Macro *tmp;
     int macroExists = 0;
-    tmp = head;
-    char* macroNamePointer = macroName;
+    if (isCommentLine(line_data) || isEmptyLine(line_data))
+        return 0;
 
-    // Reading the line until from the first non-space char until the first space char
+    macroName = (char*)calloc(strlen(leftTrimmedLine) + 1, sizeof(char));
+    tmp = head;
+    macroNamePointer = macroName;
+
+    /* Reading the line until from the first non-space char until the first space char */
     while (*leftTrimmedLine && !isspace(*leftTrimmedLine)) {
         *macroNamePointer = *leftTrimmedLine;
         macroNamePointer++;
         leftTrimmedLine++;
     }
 
-    if (*removeLeadingWhiteSpaces(macroName) == NULL) {
-        // Checking whether the read macroName is empty
+    if (*removeLeadingWhiteSpaces(macroName) == (char)0) {
+        /* Checking whether the read macroName is empty */
         return 0;
     }
 
     while (tmp != NULL) {
-        // Search in the macro list to see if we can find a macro with the found name
+        /* Search in the macro list to see if we can find a macro with the found name */
         if (!strcmp(tmp->name, macroName)) {
             macroExists = 1;
             break;
@@ -113,14 +116,14 @@ char* isMacroCall(char* line_data, struct Macro* head) {
 
     if (isspace(*leftTrimmedLine)) {
         if (*removeLeadingWhiteSpaces(leftTrimmedLine) != 0) {
-            // There shouldn't be found chars after a macro call
+            /* There shouldn't be found chars after a macro call */
             printf("Error. Found trailing chars after calling a macro. Line data: %s\n", line_data);
             return 0;
         }
     }
 
     *macroNamePointer = '\0';
-    realloc(macroName, strlen(macroName) + 1);
+    macroName = realloc(macroName, strlen(macroName) + 1);
     return macroName;
 }
 
@@ -169,10 +172,14 @@ int writeMacroContent(char* macroName, FILE* file_writer_pointer, struct Macro* 
    It returns 1 if there were no errors reading the file, and 0 if there were errors reading it.
 */
 int readMacros(char* file_name, struct Macro* head) {
-    char* full_file_path = (char*)malloc(strlen(file_name) + strlen(SOURCE_FILE_EXTENSION) + 1);
-    strcpy(full_file_path, file_name);
-    strncat(full_file_path, SOURCE_FILE_EXTENSION, strlen(SOURCE_FILE_EXTENSION));
+    char* full_file_path = (char*)malloc(strlen(file_name) + strlen(SOURCE_FILE_EXTENSION) + 1), * macroName;
+    char line_data[MAX_LINE_LEN + 3];
+    int i = 0,  foundMacro = 0;
+    struct Macro *tmp;
     FILE *file_pointer;
+
+    strcpy(full_file_path, file_name);
+    strcat(full_file_path, SOURCE_FILE_EXTENSION);
     if (access(full_file_path, F_OK) != 0) {
         printf("No such file: '%s'\n", full_file_path);
         free(full_file_path);
@@ -184,16 +191,11 @@ int readMacros(char* file_name, struct Macro* head) {
         free(full_file_path);
         return 0;
     }
-    // We initialize it with + 3, to ensure we have space for \n, for the '\0' char,
-    // and for another potential char (to verify we don't exceed from max line length limit)
-    char line_data[MAX_LINE_LEN + 3];
+    /* We initialize it with + 3, to ensure we have space for \n, for the '\0' char, */
+    /* and for another potential char (to verify we don't exceed from max line length limit) */
     memset(line_data, '\0', MAX_LINE_LEN + 3);
-    int i = 0;
-    int foundMacro = 0;
-    struct Macro *tmp;
-    char* macroName;
     while(fgets(line_data, MAX_LINE_LEN + 3, file_pointer)) {
-        if (strlen(line_data) > MAX_LINE_LEN + 1) {  // Including last \n char
+        if (strlen(line_data) > MAX_LINE_LEN + 1) {  /* Including last \n char */
             printf("Error! Line %d of file %s exceeds line length limit (%d)\n",
                    i + 1, full_file_path, MAX_LINE_LEN);
             free(full_file_path);
@@ -258,17 +260,19 @@ int readMacros(char* file_name, struct Macro* head) {
 */
 int writeMacros(char* file_name, struct Macro* head) {
     char* full_file_path = (char*)calloc(strlen(file_name) + strlen(SOURCE_FILE_EXTENSION) + 1, sizeof(char));
-    strcpy(full_file_path, file_name);
-    strncat(full_file_path, SOURCE_FILE_EXTENSION, strlen(SOURCE_FILE_EXTENSION));
-    char* new_file_path = (char*)calloc(strlen(file_name) + strlen(PRE_PROCESSING_FILE_EXTENSION) + 1, sizeof(char));
-    strcpy(new_file_path, file_name);
-    strncat(new_file_path, PRE_PROCESSING_FILE_EXTENSION, strlen(PRE_PROCESSING_FILE_EXTENSION));
-    int foundMacro = 0;
-    FILE *file_reader_pointer;
-    FILE *file_writer_pointer;
-    // We initialize it with + 3, to ensure we have space for \n, for the '\0' char,
-    // and for another potential char (to verify we don't exceed from max line length limit)
+    char* new_file_path;
     char line_data[MAX_LINE_LEN + 3];
+    int foundMacro = 0, i = 0;
+
+    FILE *file_reader_pointer, *file_writer_pointer;
+    strcpy(full_file_path, file_name);
+    strcat(full_file_path, SOURCE_FILE_EXTENSION);
+    new_file_path = (char*)calloc(strlen(file_name) + strlen(PRE_PROCESSING_FILE_EXTENSION) + 1, sizeof(char));
+    strcpy(new_file_path, file_name);
+    strcat(new_file_path, PRE_PROCESSING_FILE_EXTENSION);
+
+    /* We initialize it with + 3, to ensure we have space for \n, for the '\0' char
+       and for another potential char (to verify we don't exceed from max line length limit) */
     memset(line_data, '\0', MAX_LINE_LEN + 3);
     file_reader_pointer = fopen(full_file_path,"r");
     if (file_reader_pointer == NULL) {
@@ -278,9 +282,8 @@ int writeMacros(char* file_name, struct Macro* head) {
         return 0;
     }
     file_writer_pointer = fopen(new_file_path,"w");
-    int i = 0;
     while(fgets(line_data, MAX_LINE_LEN + 3, file_reader_pointer)) {
-        if (strlen(line_data) > MAX_LINE_LEN + 1)  // Including last \n char
+        if (strlen(line_data) > MAX_LINE_LEN + 1)  /* Including last \n char */
             printf("Error! Line %d of file %s exceeds line length limit (%d)\n",
                    i + 1, full_file_path, MAX_LINE_LEN);
         else if (!foundMacro) {
@@ -294,7 +297,7 @@ int writeMacros(char* file_name, struct Macro* head) {
                 else
                     if(parseMacroName(line_data))
                         foundMacro = 1;
-                    else // If the line is not a valid macro start, copy it to the .am file
+                    else /* If the line is not a valid macro start, copy it to the .am file */
                         fprintf(file_writer_pointer, "%s", line_data);
              } else
                  if (isMacroEnd(line_data))
