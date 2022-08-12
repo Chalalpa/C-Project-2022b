@@ -1,9 +1,26 @@
 #include "main.h"
 
+int freeDecodedLines(struct DecodedLine* decodedLineHead) {
+    struct DecodedLine* headPointer = decodedLineHead;
+    struct DecodedLine* nextPointer = decodedLineHead->next;
+    do {
+        freeDecodedLine(headPointer);
+        headPointer = nextPointer;
+        if (headPointer != NULL)
+            nextPointer = headPointer->next;
+    }
+    while (headPointer != NULL);
+    return 1;
+}
+
 int freeMacros(struct Macro* macroHead) {
     struct Macro* headPointer = macroHead;
     struct Macro* nextPointer = macroHead->next;
     do {
+        if(strcmp(headPointer->name, EMPTY_STRUCT_NAME)) {
+            free(headPointer->data);
+            free(headPointer->name);
+        }
         free(headPointer);
         headPointer = nextPointer;
         if (headPointer != NULL)
@@ -17,6 +34,9 @@ int freeSymbols(struct Symbol* symbolHead) {
     struct Symbol* headPointer = symbolHead;
     struct Symbol* nextPointer = symbolHead->next;
     do {
+        if(strcmp(headPointer->name, EMPTY_STRUCT_NAME)) {
+            free(headPointer->name);
+        }
         free(headPointer);
         headPointer = nextPointer;
         if (headPointer != NULL)
@@ -30,6 +50,8 @@ int freeEntries(struct Entry* entryHead) {
     struct Entry* headPointer = entryHead;
     struct Entry* nextPointer = entryHead->next;
     do {
+        if(strcmp(headPointer->name, EMPTY_STRUCT_NAME))
+            free(headPointer->name);
         free(headPointer);
         headPointer = nextPointer;
         if (headPointer != NULL)
@@ -43,6 +65,8 @@ int freeExterns(struct Extern* externHead) {
     struct Extern* headPointer = externHead;
     struct Extern* nextPointer = externHead->next;
     do {
+        if(strcmp(headPointer->name, EMPTY_STRUCT_NAME))
+            free(headPointer->name);
         free(headPointer);
         headPointer = nextPointer;
         if (headPointer != NULL)
@@ -101,7 +125,7 @@ int main(int argc, char *argv[])
             result = writeMacros(fileName, macroHead);
             if (result) {
                 printf("==============First Iteration===============\n");
-                firstRun(fileName, &IC, &DC, symbolHead, decodedLineHead, entryHead,
+                result = firstRun(fileName, &IC, &DC, symbolHead, decodedLineHead, entryHead,
                                               externHead);
                 if (result == 1) {
                     printf("==============Second Iteration===============\n");
@@ -110,12 +134,22 @@ int main(int argc, char *argv[])
                     if (result)
                         printf("Successfully compiled file: %s\n", fileName);
                 }
+                else {
+                    printf("Failed in First Iteration phase!\n");
+                }
             }
+            else {
+                printf("Failed in Preprocessor phase!\n");
+            }
+        }
+        else {
+            printf("Failed in Preprocessor phase!\n");
         }
         freeMacros(macroHead);
         freeSymbols(symbolHead);
         freeExterns(externHead);
         freeEntries(entryHead);
+        freeDecodedLines(decodedLineHead);
     }
 
     return 0;

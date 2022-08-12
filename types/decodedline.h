@@ -1,5 +1,6 @@
 #ifndef _DECODED_LINE_
 #define _DECODED_LINE_
+#include "stdlib.h"
 
 /* This struct represents a line that we decode into binary words. We store a few properties of it to be able
  * later, easily, to parse it into base32 machine code as to the imaginary computer */
@@ -13,5 +14,7 @@ struct DecodedLine {
     int isEmpty;  /* Symbols whether the line object is empty (no content) or not */
     struct DecodedLine* next;  /* A pointer to the next-in-list DecodedLine object */
 };
+
+int freeDecodedLine(struct DecodedLine* headPointer);
 
 #endif

@@ -175,4 +175,6 @@ char* getNextField(char* line_data);
 */
 char* binToSpecialB32(char* n);
 
+int freeStringsArray(char** arr, int size);
+
 #endif

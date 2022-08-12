@@ -97,6 +97,12 @@ build CMakeFiles/untitled4.dir/processing/secondrun.c.obj: C_COMPILER__untitled4
   OBJECT_DIR = CMakeFiles\untitled4.dir
   OBJECT_FILE_DIR = CMakeFiles\untitled4.dir\processing
 
+build CMakeFiles/untitled4.dir/types/decodedline.c.obj: C_COMPILER__untitled4_Debug C$:/Users/Moshe/CLionProjects/C-Project-2022b/types/decodedline.c || cmake_object_order_depends_target_untitled4
+  DEP_FILE = CMakeFiles\untitled4.dir\types\decodedline.c.obj.d
+  FLAGS = -g -std=gnu99
+  OBJECT_DIR = CMakeFiles\untitled4.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled4.dir\types
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target untitled4
@@ -105,7 +111,7 @@ build CMakeFiles/untitled4.dir/processing/secondrun.c.obj: C_COMPILER__untitled4
 #############################################
 # Link the executable untitled4.exe
 
-build untitled4.exe: C_EXECUTABLE_LINKER__untitled4_Debug CMakeFiles/untitled4.dir/main.c.obj CMakeFiles/untitled4.dir/processing/preprocessing.c.obj CMakeFiles/untitled4.dir/helpers/common_utils.c.obj CMakeFiles/untitled4.dir/processing/firstrun.c.obj CMakeFiles/untitled4.dir/helpers/consts.c.obj CMakeFiles/untitled4.dir/types/operations.c.obj CMakeFiles/untitled4.dir/types/directives.c.obj CMakeFiles/untitled4.dir/processing/secondrun.c.obj
+build untitled4.exe: C_EXECUTABLE_LINKER__untitled4_Debug CMakeFiles/untitled4.dir/main.c.obj CMakeFiles/untitled4.dir/processing/preprocessing.c.obj CMakeFiles/untitled4.dir/helpers/common_utils.c.obj CMakeFiles/untitled4.dir/processing/firstrun.c.obj CMakeFiles/untitled4.dir/helpers/consts.c.obj CMakeFiles/untitled4.dir/types/operations.c.obj CMakeFiles/untitled4.dir/types/directives.c.obj CMakeFiles/untitled4.dir/processing/secondrun.c.obj CMakeFiles/untitled4.dir/types/decodedline.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\untitled4.dir

@@ -29,7 +29,7 @@ char* strrev(char *str)
 */
 char* decToBinary(int n, int len)
 {
-    char* binaryNumber = (char*)calloc(len, sizeof(char));
+    char* binaryNumber = (char*)calloc(len + 1, sizeof(char));
     char* binaryNumberPointer = binaryNumber;
     int i;
     /* Size of an integer is assumed to be <len> bits */
@@ -361,12 +361,15 @@ int isValidString(char* string) {
 */
 int getAddressingIndex(char* string) {
     char* strPointer = removeEndingWhiteSpaces(string);
+    int addressingIndex = 0;
     strPointer += strlen(string) - 2;
-    if (!strcmp(strPointer, ".1"))
-        return 1;
-    if (!(strcmp(strPointer, ".2")))
-        return 2;
-    return 0;
+    if (strlen(string) > 2) {
+        if (!strcmp(strPointer, ".1"))
+            addressingIndex = 1;
+        if (!(strcmp(strPointer, ".2")))
+            addressingIndex = 2;
+    }
+    return addressingIndex;
 }
 
 /* @ Function: getLabelName(char* line_data)
@@ -379,8 +382,10 @@ char* getLabelName(char* line_data) {
     char *leftTrimmedLine = removeLeadingWhiteSpaces(line_data);
     char *labelName = (char *) calloc(strlen(leftTrimmedLine) + 1, sizeof(char));
     char *labelNamePointer = labelName;
-    if (isCommentLine(line_data) || isEmptyLine(line_data))
+    if (isCommentLine(line_data) || isEmptyLine(line_data)) {
+        free(labelName);
         return 0;
+    }
     while (*leftTrimmedLine && !isspace(*leftTrimmedLine) && *leftTrimmedLine != ':') {
         *labelNamePointer = *leftTrimmedLine;
         labelNamePointer++;
@@ -388,12 +393,14 @@ char* getLabelName(char* line_data) {
     }
     if (!*leftTrimmedLine || isspace(*leftTrimmedLine)) {
         /* No ':' found until first space */
+        free(labelName);
         return 0;
     }
     /* We found ':' */
     if(!isspace(*(leftTrimmedLine + 1))) {
         /* if the next char after the ':' is not a whitespace, it's not a legal label */
         printf("Found trailing chars after label's declaration, expected a whitespace: %s\n", line_data);
+        free(labelName);
         return 0;
     }
     *labelNamePointer = '\0';
@@ -424,7 +431,20 @@ char* getNextField(char* line_data) {
         fieldNamePointer++;
         lineDataPointer++;
     }
-    if (isEmptyLine(fieldName))
-        return 0;
+    fieldName = realloc(fieldName, strlen(fieldName) + 1);
+    *(fieldName + strlen(fieldName)) = '\0';
+    if (isEmptyLine(fieldName)) {
+        free(fieldName);
+        fieldName = 0;
+    }
     return fieldName;
+}
+
+int freeStringsArray(char** arr, int size) {
+    int i;
+    for(i = 0; i < size; i++) {
+        free(arr[i]);
+    }
+    free(arr);
+    return 1;
 }

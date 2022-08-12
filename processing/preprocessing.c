@@ -98,6 +98,7 @@ char* isMacroCall(char* line_data, struct Macro* head) {
 
     if (*removeLeadingWhiteSpaces(macroName) == (char)0) {
         /* Checking whether the read macroName is empty */
+        free(macroName);
         return 0;
     }
 
@@ -111,6 +112,7 @@ char* isMacroCall(char* line_data, struct Macro* head) {
     }
 
     if (!macroExists) {
+        free(macroName);
         return 0;
     }
 
@@ -118,6 +120,7 @@ char* isMacroCall(char* line_data, struct Macro* head) {
         if (*removeLeadingWhiteSpaces(leftTrimmedLine) != 0) {
             /* There shouldn't be found chars after a macro call */
             printf("Error. Found trailing chars after calling a macro. Line data: %s\n", line_data);
+            free(macroName);
             return 0;
         }
     }
@@ -262,6 +265,7 @@ int writeMacros(char* file_name, struct Macro* head) {
     char* full_file_path = (char*)calloc(strlen(file_name) + strlen(SOURCE_FILE_EXTENSION) + 1, sizeof(char));
     char* new_file_path;
     char line_data[MAX_LINE_LEN + 3];
+    char* macroName;
     int foundMacro = 0, i = 0;
 
     FILE *file_reader_pointer, *file_writer_pointer;
@@ -288,17 +292,20 @@ int writeMacros(char* file_name, struct Macro* head) {
                    i + 1, full_file_path, MAX_LINE_LEN);
         else if (!foundMacro) {
                 if (!isMacroStart(line_data)) {
-                    char* macroName = isMacroCall(line_data, head);
+                    macroName = isMacroCall(line_data, head);
                     if (macroName)
                         writeMacroContent(macroName, file_writer_pointer, head);
                     else
                         fprintf(file_writer_pointer, "%s", line_data);
                 }
-                else
-                    if(parseMacroName(line_data))
+                else {
+                    macroName = parseMacroName(line_data);
+                    if (macroName)
                         foundMacro = 1;
                     else /* If the line is not a valid macro start, copy it to the .am file */
                         fprintf(file_writer_pointer, "%s", line_data);
+                }
+                free(macroName);
              } else
                  if (isMacroEnd(line_data))
                     foundMacro = 0;
