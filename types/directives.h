@@ -6,9 +6,9 @@
 
 /* Represents a Directive type (data, extern, struct...) */
 struct Directive {
-    char* name;
-    int minOperandsNum;
-    int maxOperandsNum;
+    char* name;  /* The directive name as it's being declared in the assembly file */
+    int minOperandsNum;  /* The minimum possible operands for this directive */
+    int maxOperandsNum;  /* The maximum possible operands for this directive*/
 };
 
 

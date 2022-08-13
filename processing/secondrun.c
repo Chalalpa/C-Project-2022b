@@ -65,9 +65,12 @@ int writeEntriesFile(char* fileName, struct Entry* entryHead, struct Symbol* sym
     int entriesCount = 0;
     char* new_file_path, *b32, *binary;
     FILE *file_writer_pointer;
+
+    /* Conduct full file path */
     new_file_path = (char*)malloc(strlen(fileName) + strlen(ENTRIES_FILE_EXTENSION) + 1);
     strcpy(new_file_path, fileName);
     strcat(new_file_path, ENTRIES_FILE_EXTENSION);
+
     file_writer_pointer = fopen(new_file_path,"w");
     while (entryPointer != NULL) {
         if (strcmp(entryPointer->name, EMPTY_STRUCT_NAME)) {
@@ -124,9 +127,12 @@ int writeExternsFile(char* fileName, struct Extern* externHead, struct Symbol* s
     int addressValue, externsCount = 0;
     char* new_file_path, *name, *extension, *b32, *decimal;
     FILE *file_writer_pointer;
+
+    /* Conduct full file path */
     new_file_path = (char*)malloc(strlen(fileName) + strlen(EXTERNS_FILE_EXTENSION) + 1);
     strcpy(new_file_path, fileName);
     strcat(new_file_path, EXTERNS_FILE_EXTENSION);
+
     file_writer_pointer = fopen(new_file_path,"w");
     while (decodeLinePointer != NULL) {
         if (!decodeLinePointer->isEmpty) {
@@ -222,7 +228,7 @@ int writeExternsFile(char* fileName, struct Extern* externHead, struct Symbol* s
    32' base, and writes .ext and .ent files accordingly.
 */
 int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead,
-              struct Entry* entryHead, struct Extern* externHead) {
+              struct Entry* entryHead, struct Extern* externHead, int IC, int DC) {
     /* Conduct full file path */
     int ICCopy = MEMORY_START;
 
@@ -331,6 +337,18 @@ int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* de
         strcpy(new_file_path, file_name);
         strcat(new_file_path, OBJECT_FILE_EXTENSION);
         file_writer_pointer = fopen(new_file_path, "w");
+
+        /* Writing IC and DC */
+        binary = decToBinary(IC - MEMORY_START - DC, 8);
+        lineSpecialB32 = binToSpecialB32(binary);
+        fprintf(file_writer_pointer, "%s ", lineSpecialB32);
+        free(binary);
+        free(lineSpecialB32);
+        binary = decToBinary(DC, 8);
+        lineSpecialB32 = binToSpecialB32(binary);
+        fprintf(file_writer_pointer, "%s\n", lineSpecialB32);
+        free(binary);
+        free(lineSpecialB32);
 
         /* Iterating through the decoded lines list, and printing to the objects file, the machine code according to the */
         /* unique 32' base */

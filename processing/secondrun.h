@@ -16,7 +16,7 @@
 
 
 /* @ Function: int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead,
-                             struct Entry* entryHead, struct Extern* externHead);
+                             struct Entry* entryHead, struct Extern* externHead, int IC, int DC);
    @ Arguments: char* file_name, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead,
                 struct Entry* entryHead, struct Extern* externHead
    file_name is the path that we should read from, without its extension
@@ -28,6 +28,6 @@
    32' base, and writes .ext and .ent files accordingly.
 */
 int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead,
-              struct Entry* entryHead, struct Extern* externHead);
+              struct Entry* entryHead, struct Extern* externHead, int IC, int DC);
 
 #endif

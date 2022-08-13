@@ -1,4 +1,7 @@
 #include "decodedline.h"
+
+
+/* A method for freeing a DecodedLine pointer object allocated memory */
 int freeDecodedLine(struct DecodedLine* headPointer) {
     int count, i;
     if(!headPointer->isEmpty) {

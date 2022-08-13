@@ -175,6 +175,12 @@ char* getNextField(char* line_data);
 */
 char* binToSpecialB32(char* n);
 
+/* @ Function: int freeStringsArray(char** arr, int size)
+   @ Arguments: char** arr, int size
+   arr - string array wished to be freed
+   size - the size of the array
+   @ Description: The function frees the array and its contents, and returns 1 if it went successful.
+*/
 int freeStringsArray(char** arr, int size);
 
 #endif

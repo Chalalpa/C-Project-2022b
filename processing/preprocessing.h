@@ -5,16 +5,9 @@
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
+#include "../types/macro.h"
 #include "../helpers/consts.h"
 #include "../helpers/common_utils.h"
-
-
-/* Defining a Macro linked list structure*/
-struct Macro {
-    char* name;  /* The macro name to be used later in the source code */
-    char* data;  /* The macro content itself to deploy later in the code */
-    struct Macro* next;  /* A pointer to the next Macro struct object */
-};
 
 /* @ Function: int readMacros(char* file_name, struct Macro* head);
    @ Arguments: char* file_name, struct Macro* head

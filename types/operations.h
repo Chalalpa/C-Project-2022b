@@ -13,12 +13,12 @@ struct AddressingMethodsConfig {
 
 /* A struct to represent each of the supported operations and their properties*/
 struct Operation {
-    char* name;
+    char* name;  /* The operation name as it's shown in the assembly file */
     int opCode;  /* 0 to 15, decimal */
     char binaryCode[4]; /* 0 to 15, binary */
-    int operandsNum;
-    struct AddressingMethodsConfig sourceAddressingMethods;
-    struct AddressingMethodsConfig targetAddressingMethods;
+    int operandsNum;  /* The operands number required for this operation */
+    struct AddressingMethodsConfig sourceAddressingMethods;  /* The addressing methods config for src operand possible for this operation */
+    struct AddressingMethodsConfig targetAddressingMethods;  /* The addressing methods config for tgt operand possible for this operation */
 };
 
 

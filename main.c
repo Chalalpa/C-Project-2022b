@@ -1,5 +1,6 @@
 #include "main.h"
 
+/* Freeing methods */
 int freeDecodedLines(struct DecodedLine* decodedLineHead) {
     struct DecodedLine* headPointer = decodedLineHead;
     struct DecodedLine* nextPointer = decodedLineHead->next;
@@ -77,24 +78,31 @@ int freeExterns(struct Extern* externHead) {
 }
 
 
+/* The compiler program */
 int main(int argc, char *argv[])
 {
     int IC;  /* Instruction counter */
     int DC; /* Data counter */
+
+    /* Iterations helpers */
     int i, result;
     char* fileName;
+
+    /* Storing the data structures: */
     struct Macro* macroHead = NULL;
     struct Symbol* symbolHead = NULL;
     struct DecodedLine* decodedLineHead = NULL;
     struct Entry* entryHead = NULL;
     struct Extern* externHead = NULL;
 
-    if (argc == 0) {
+    if (argc <= 1) {  /* The first argument is always the executable, so we need to ignore it */
         printf("No files paths were provided");
         return 0;
     }
 
-    for (i = 0; i < argc; i++) {
+    /* Ignoring first command line arg, which is the executable */
+    for (i = 1; i < argc; i++) {
+        /* For each new file, initializing default values */
         IC = MEMORY_START;
         DC = 0;
         macroHead = (struct Macro*)malloc(sizeof(struct Macro));
@@ -118,33 +126,36 @@ int main(int argc, char *argv[])
         externHead->name = EMPTY_STRUCT_NAME;
         externHead->next = NULL;
         fileName = argv[i];
+
+        /* Start preprocessing */
         printf("==============Reading Macros===============\n");
         result = readMacros(argv[i], macroHead);
-        if (result) {
+        if (result) {  /* If failed, no need to write .am file */
             printf("==============Writing Macros===============\n");
             result = writeMacros(fileName, macroHead);
             if (result) {
                 printf("==============First Iteration===============\n");
                 result = firstRun(fileName, &IC, &DC, symbolHead, decodedLineHead, entryHead,
                                               externHead);
-                if (result == 1) {
+                if (result) {
                     printf("==============Second Iteration===============\n");
-                    result = secondRun(fileName, symbolHead, decodedLineHead, entryHead,
-                                                    externHead);
+                    result = secondRun(fileName, symbolHead, decodedLineHead, entryHead, externHead,
+                                       IC, DC);
                     if (result)
                         printf("Successfully compiled file: %s\n", fileName);
+                    else
+                        printf("Failed in Second Iteration phase!\n");
                 }
-                else {
+                else
                     printf("Failed in First Iteration phase!\n");
-                }
             }
-            else {
+            else
                 printf("Failed in Preprocessor phase!\n");
-            }
         }
-        else {
+        else
             printf("Failed in Preprocessor phase!\n");
-        }
+
+        /* Freeing memory allocated for this file's compiling */
         freeMacros(macroHead);
         freeSymbols(symbolHead);
         freeExterns(externHead);

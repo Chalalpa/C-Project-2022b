@@ -3,7 +3,7 @@
 #include "stdlib.h"
 
 /* This struct represents a line that we decode into binary words. We store a few properties of it to be able
- * later, easily, to parse it into base32 machine code as to the imaginary computer */
+ * later, easily, parse it into base32 machine code as to the imaginary computer */
 struct DecodedLine {
     char** binaryValue;  /* A strings array that holds the binary machine code of each of the translated words */
     int value;  /* The initial value of the line */

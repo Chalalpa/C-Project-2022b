@@ -3,13 +3,21 @@
 
 /* A constants file, to store all kinds of constants that might be re-used in the project */
 
+
+/* Imaginary computer definitions and limitations */
 #define BINARY_WORD_SIZE 10
 #define MEMORY_START 100
 #define OP_SIZE 16
-#define RAM_MEMORY_SIZE 256
+#define RAM_MEMORY_SIZE 256  /* It's the limit of the memory, although we weren't asked to use it in anyway */
+
+
+/* Strings inputs limitations*/
 #define MAX_LABEL_LEN 30
 #define MAX_LINE_LEN 80
 #define MAX_LINES 100
+
+
+/* Input/Output files extensions */
 #define SOURCE_FILE_EXTENSION ".as"
 #define PRE_PROCESSING_FILE_EXTENSION ".am"
 #define OBJECT_FILE_EXTENSION ".ob"
@@ -29,16 +37,18 @@
 #define ENTRY_NO_DOT "entry"
 #define EXTERN_NO_DOT "extern"
 
+
 /* Symbols */
 #define CODE "code"
 #define DATA_DIRECTIVE "data"
 #define EXTERNAL_DIRECTIVE "external"
 
+
 /* Macro */
 #define MACRO_START "macro"
 #define MACRO_END "endmacro"
 
-#define EMPTY_STRUCT_NAME "!empty_struct!"
+#define EMPTY_STRUCT_NAME "!empty_struct!"  /* Helps to define if a struct is really initialized with data or not */
 
 /* Registers*/
 #define R0 "r0"
@@ -72,7 +82,7 @@
 
 
 /* Decoding */
-#define TO_BE_FILLED "?"
+#define TO_BE_FILLED "?"  /* Will be used later as an indication that a binary word should get completed, when more info is provided*/
 
 extern const char* DATA_DIRECTIVES[];
 extern const char* EXTERN_OR_ENTRY[];

@@ -1,5 +1,5 @@
 ; dfsdf sdr4545
-.entry mov
+.entry LOOP
 .entry LENGTH
 .extern W
 mov: 	mov S1.1 		, W

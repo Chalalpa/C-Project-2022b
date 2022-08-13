@@ -408,6 +408,7 @@ char* getLabelName(char* line_data) {
     if(isValidLabel(labelName))
         return labelName;
     /* If label is not valid, the function should print the exact reason */
+    free(labelName);
     return 0;
 
 }
@@ -440,6 +441,12 @@ char* getNextField(char* line_data) {
     return fieldName;
 }
 
+/* @ Function: int freeStringsArray(char** arr, int size)
+   @ Arguments: char** arr, int size
+   arr - string array wished to be freed
+   size - the size of the array
+   @ Description: The function frees the array and its contents, and returns 1 if it went successful.
+*/
 int freeStringsArray(char** arr, int size) {
     int i;
     for(i = 0; i < size; i++) {
