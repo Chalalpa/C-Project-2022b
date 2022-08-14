@@ -101,9 +101,9 @@ int writeEntriesFile(char* fileName, struct Entry* entryHead, struct Symbol* sym
         entryPointer = entryPointer->next;
     }
     fclose(file_writer_pointer);
-    free(new_file_path);
     if (entriesCount <= 0)
         remove(new_file_path);
+    free(new_file_path);
     return 1;
 }
 
@@ -315,16 +315,18 @@ int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* de
         linePointer = linePointer->next;
     }
 
-    /* Writing entries file */
-    if (!writeEntriesFile(file_name, entryHead, symbolHead)) {
-        printf("Error! Couldn't write entries file\n");
-        status = 0;
-    }
+    if (status) {
+        /* Writing entries file */
+        if (!writeEntriesFile(file_name, entryHead, symbolHead)) {
+            printf("Error! Couldn't write entries file\n");
+            status = 0;
+        }
 
-    /* Writing externs file */
-    if (!writeExternsFile(file_name, externHead, symbolHead, decodedLineHead)) {
-        printf("Error! Couldn't write entries file\n");
-        status = 0;
+        /* Writing externs file */
+        if (!writeExternsFile(file_name, externHead, symbolHead, decodedLineHead)) {
+            printf("Error! Couldn't write entries file\n");
+            status = 0;
+        }
     }
 
     if (status) {

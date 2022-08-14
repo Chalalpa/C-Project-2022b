@@ -1,0 +1,11 @@
+Compiling file examples/invalid/too_few_operands_for_operation_2
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Ignoring empty line number 11:
+
+Error! expected 1 operands for operation bne, found less:       bne
+Error! Couldn't decode line number 13:  bne
+Failed in First Iteration phase!

@@ -1,12 +1,11 @@
 ; dfsdf sdr4545
 .entry LOOP
 .entry LENGTH
-
-.extern W
-MAIN: 	mov W,S1.1
-	add r2,STR
+.extern W 
+MAIN: 	mov S1.1 		, W
+	add r2
 	LOOP:		jmp W
-	macro m1		
+	macro m1
 		inc	K
 		
 		mov S1.2 ,r3

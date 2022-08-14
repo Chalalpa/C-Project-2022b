@@ -1,0 +1,11 @@
+Compiling file examples/invalid/symbol_declaration_as_extern
+==============Reading Macros===============
+==============Writing Macros===============
+==============First Iteration===============
+Ignoring comment line number 1: ; dfsdf sdr4545
+
+Ignoring empty line number 12:
+
+==============Second Iteration===============
+Error! Can't define extern and symbol with the same name. Symbol defined in line 6, Extern defined in line 3
+Failed in Second Iteration phase!

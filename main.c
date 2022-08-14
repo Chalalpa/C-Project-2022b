@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     struct Extern* externHead = NULL;
 
     if (argc <= 1) {  /* The first argument is always the executable, so we need to ignore it */
-        printf("No files paths were provided");
+        printf("No files paths were provided, Exiting...\n");
         return 0;
     }
 
@@ -127,6 +127,7 @@ int main(int argc, char *argv[])
         externHead->next = NULL;
         fileName = argv[i];
 
+        printf("Compiling file %s\n", fileName);
         /* Start preprocessing */
         printf("==============Reading Macros===============\n");
         result = readMacros(argv[i], macroHead);

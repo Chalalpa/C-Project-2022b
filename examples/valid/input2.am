@@ -1,0 +1,19 @@
+.entry LOOP
+.entry LENGTH
+MAIN:		mov  #3,r4
+			add		#5,r3
+LOOP: 		jmp		END
+
+			prn		#-5
+			sub		r1, r4
+			not r2
+				mov		S1.2 ,r3
+				inc		r1
+			bne		LOOP
+				mov		S1.1 ,r3
+				jmp		r1
+END: 		rts
+STR: 		.string "jbfkdbvk"
+LENGTH:		.data	-5,67
+K: 			.data 5
+S1: 		.struct  8, "ab"
