@@ -1,9 +1,11 @@
+Compiling file examples/errors/data_invalid_number
 ==============Reading Macros===============
 ==============Writing Macros===============
 ==============First Iteration===============
 Ignoring comment line number 1: ; dfsdf sdr4545
 
-Ignoring empty line number 11:
+Ignoring empty line number 11: 		
 
-Error! Found an invalid number operand for .data data directive:        .data 45436
-Error! Couldn't decode line number 17: K:       .data 45436
+Error! Found an invalid number operand for .data data directive: 	.data 45436
+Error! Couldn't decode line number 17: K:	.data 45436
+Failed in First Iteration phase!

@@ -1,6 +1,7 @@
 x: .data 23
 y: .string "abcdef"
 s: .struct 9, "abc"
+
 MAIN: mov #1, x
 mov #1, s.1
 mov #1, r1

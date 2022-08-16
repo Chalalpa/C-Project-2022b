@@ -1,3 +1,10 @@
+Compiling file examples/errors/line_too_long
 ==============Reading Macros===============
-Error! Line 4 of file C:\Users\Moshe\CLionProjects\C-Project-2022b\examples\errors\line_too_long.as exceeds line length
-limit (80)
+Error! Line 4 of file examples/errors/line_too_long.as exceeds line length limit (80)
+Error! Line 5 of file examples/errors/line_too_long.as exceeds line length limit (80)
+Error! Line 6 of file examples/errors/line_too_long.as exceeds line length limit (80)
+Error! Line 7 of file examples/errors/line_too_long.as exceeds line length limit (80)
+Error! Line 8 of file examples/errors/line_too_long.as exceeds line length limit (80)
+Error! Line 9 of file examples/errors/line_too_long.as exceeds line length limit (80)
+Error! Line 10 of file examples/errors/line_too_long.as exceeds line length limit (80)
+Failed in Preprocessor phase!

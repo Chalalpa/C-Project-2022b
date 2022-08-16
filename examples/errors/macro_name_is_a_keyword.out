@@ -1,3 +1,5 @@
+Compiling file examples/errors/macro_name_is_a_keyword
 ==============Reading Macros===============
 Error. macro's name is actually a keyword: struct
-Error reading macros in line 8, discarding writing .am file
+Error reading macros in line 8
+Failed in Preprocessor phase!

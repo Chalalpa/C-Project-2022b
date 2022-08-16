@@ -61,6 +61,7 @@ char* parseMacroName(char * line_data) {
     if (isspace(*leftTrimmedLine)) {
         if (*removeLeadingWhiteSpaces(leftTrimmedLine) != 0) {
             printf("Error. Found trailing chars after reading macro name. Line data: %s\n", line_data);
+            free(macroName);
             return 0;
         }
     }

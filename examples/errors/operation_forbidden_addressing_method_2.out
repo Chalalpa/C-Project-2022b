@@ -1,5 +1,4 @@
-==============Reading Macros===============
-No such file: 'C:\Users\Moshe\CLionProjects\C-Project-2022b\cmake-build-debug\untitled4.exe.as'
+Compiling file examples/errors/operation_forbidden_addressing_method_2
 ==============Reading Macros===============
 ==============Writing Macros===============
 ==============First Iteration===============
@@ -7,3 +6,8 @@ Ignoring comment line number 1: ; dfsdf sdr4545
 
 Error! operation lea does not support reg addressing from source: lea r3, r4
 Error! Couldn't decode line number 5: lea r3, r4
+Ignoring empty line number 12: 		
+
+Error! operation mov does not support direct addressing to target: 		mov S1.2 ,#-5
+Error! Couldn't decode line number 13: 		mov S1.2 ,#-5
+Failed in First Iteration phase!

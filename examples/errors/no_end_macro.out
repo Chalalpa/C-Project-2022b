@@ -1,2 +1,3 @@
+Compiling file examples/errors/no_end_macro
 ==============Reading Macros===============
-Error! couldn't find 'endmacro' as a macro finish, to m1 macro
+Error! couldn't find 'endmacro' as a macro finish, to m1 macroFailed in Preprocessor phase!

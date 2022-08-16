@@ -9,6 +9,7 @@ struct DecodedLine {
     int value;  /* The initial value of the line */
     int length;  /* The number of how many words this assembly line is translated into */
     int lineNum;  /* Original line number, in the assembly file */
+    int isData; /* An int/boolean to decide whether it's a data sentence or not*/
     char* srcOperandName;  /* The name of the source operand */
     char* tgtOperandName;  /* The name of the target operand */
     int isEmpty;  /* Symbols whether the line object is empty (no content) or not */

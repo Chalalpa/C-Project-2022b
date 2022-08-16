@@ -1,9 +1,11 @@
+Compiling file examples/errors/operation_forbidden_addressing_method
 ==============Reading Macros===============
 ==============Writing Macros===============
 ==============First Iteration===============
 Ignoring comment line number 1: ; dfsdf sdr4545
 
-Ignoring empty line number 11:
+Ignoring empty line number 11: 		
 
-Error! operation mov does not support direct addressing to target:              mov S1.2 ,#-5
-Error! Couldn't decode line number 12:          mov S1.2 ,#-5
+Error! operation mov does not support direct addressing to target: 		mov S1.2 ,#-5
+Error! Couldn't decode line number 12: 		mov S1.2 ,#-5
+Failed in First Iteration phase!

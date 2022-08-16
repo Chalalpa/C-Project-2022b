@@ -1,3 +1,4 @@
+Compiling file examples/errors/entry_not_initialized
 ==============Reading Macros===============
 ==============Writing Macros===============
 ==============First Iteration===============
@@ -8,3 +9,4 @@ Ignoring empty line number 11:
 ==============Second Iteration===============
 Error! Entry LOOP1 declared in line 2 is not initialized later in the file
 Error! Couldn't write entries file
+Failed in Second Iteration phase!

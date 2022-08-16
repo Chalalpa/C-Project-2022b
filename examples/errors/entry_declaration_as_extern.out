@@ -1,3 +1,4 @@
+Compiling file examples/errors/entry_declaration_as_extern
 ==============Reading Macros===============
 ==============Writing Macros===============
 ==============First Iteration===============
@@ -7,3 +8,5 @@ Ignoring empty line number 12:
 
 ==============Second Iteration===============
 Error! Can't define extern and entry with the same name. Entry defined in line 2, Extern defined in line 3
+Error! Can't define extern and symbol with the same name. Symbol defined in line 8, Extern defined in line 3
+Failed in Second Iteration phase!

@@ -1,12 +1,12 @@
-Compiling file examples/valid/example_1
+Compiling file examples/valid/valid_1
 ==============Reading Macros===============
 ==============Writing Macros===============
 ==============First Iteration===============
 Ignoring comment line number 1: ; dfsdf sdr4545
 
-Ignoring empty line number 4:
+Ignoring empty line number 4: 
 
-Ignoring empty line number 12:
+Ignoring empty line number 12: 		
 
 ==============Second Iteration===============
-Successfully compiled file: examples/valid/example_1
+Successfully compiled file: examples/valid/valid_1

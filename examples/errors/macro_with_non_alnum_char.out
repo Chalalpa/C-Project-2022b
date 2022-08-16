@@ -1,3 +1,5 @@
+Compiling file examples/errors/macro_with_non_alnum_char
 ==============Reading Macros===============
 Error. Found non alpha-numeric char in macro's name declaration: n!oder
-Error reading macros in line 8, discarding writing .am file
+Error reading macros in line 8
+Failed in Preprocessor phase!

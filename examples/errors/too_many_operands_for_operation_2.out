@@ -1,3 +1,4 @@
+Compiling file examples/errors/too_many_operands_for_operation_2
 ==============Reading Macros===============
 ==============Writing Macros===============
 ==============First Iteration===============
@@ -5,3 +6,6 @@ Ignoring comment line number 1: ; dfsdf sdr4545
 
 Error! expected 1 operands for operation inc, found more: 		inc	K, r3
 Error! Couldn't decode line number 10: 		inc	K, r3
+Ignoring empty line number 11: 		
+
+Failed in First Iteration phase!

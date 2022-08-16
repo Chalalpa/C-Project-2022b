@@ -1,4 +1,4 @@
-Compiling file examples/errors/struct_3_operands
+Compiling file examples/errors/string_invalid_operand
 ==============Reading Macros===============
 ==============Writing Macros===============
 ==============First Iteration===============
@@ -6,5 +6,6 @@ Ignoring comment line number 1: ; dfsdf sdr4545
 
 Ignoring empty line number 11: 		
 
-Error! Couldn't decode line number 18: S1:	.struct 8, "ab", "bc"
+Error! found an invalid string under .string data directive declaration:  .string abcdef"
+Error! Couldn't decode line number 15: STR: .string abcdef"
 Failed in First Iteration phase!

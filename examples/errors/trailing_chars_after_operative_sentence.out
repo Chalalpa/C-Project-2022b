@@ -1,9 +1,13 @@
+Compiling file examples/errors/trailing_chars_after_operative_sentence
 ==============Reading Macros===============
 ==============Writing Macros===============
 ==============First Iteration===============
 Ignoring comment line number 1: ; dfsdf sdr4545
 
-Ignoring empty line number 11:
+Ignoring empty line number 11: 		
 
-Error! Found whitespace in an operand:  bne L3 r2
-Error! Couldn't decode line number 13:  bne L3 r2
+Error! Found whitespace in an operand: 	bne L3 r2
+Error! Couldn't decode line number 13: 	bne L3 r2
+Error! Found an invalid number operand for .data data directive: 	.data 6, -945, 15
+Error! Couldn't decode line number 16: LENGTH:	.data 6, -945, 15
+Failed in First Iteration phase!

@@ -1,2 +1,4 @@
+Compiling file examples/errors/macro_defined_twice
 ==============Reading Macros===============
 Error! macro defined in line 13 was already defined earlier: 	macro m1
+Failed in Preprocessor phase!

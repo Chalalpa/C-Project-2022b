@@ -229,11 +229,8 @@ int writeExternsFile(char* fileName, struct Extern* externHead, struct Symbol* s
 */
 int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* decodedLineHead,
               struct Entry* entryHead, struct Extern* externHead, int IC, int DC) {
-    /* Conduct full file path */
-    int ICCopy = MEMORY_START;
-
     /* Iteration helper: */
-    int i, status = 1;
+    int i, status = 1, isData, ICCopy;
     char* externName, *symbolName, *new_file_path, *ICSpecialB32, *lineSpecialB32, *extension, *binary;
     struct DecodedLine* linePointer = decodedLineHead;
     struct Extern* externPointer = externHead, *externObject;
@@ -321,7 +318,9 @@ int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* de
             printf("Error! Couldn't write entries file\n");
             status = 0;
         }
+    }
 
+    if (status) {
         /* Writing externs file */
         if (!writeExternsFile(file_name, externHead, symbolHead, decodedLineHead)) {
             printf("Error! Couldn't write entries file\n");
@@ -330,10 +329,6 @@ int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* de
     }
 
     if (status) {
-        linePointer = decodedLineHead;
-        /* Getting the first valuable DecodedLine object */
-        while (linePointer != NULL && linePointer->isEmpty == 1)
-            linePointer = linePointer->next;
 
         new_file_path = (char *) malloc(strlen(file_name) + strlen(OBJECT_FILE_EXTENSION) + 1);
         strcpy(new_file_path, file_name);
@@ -354,25 +349,36 @@ int secondRun(char* file_name, struct Symbol* symbolHead, struct DecodedLine* de
 
         /* Iterating through the decoded lines list, and printing to the objects file, the machine code according to the */
         /* unique 32' base */
-        while (linePointer != NULL) {
-            int linesCount = 0, i = 0;
-            while (linesCount < linePointer->length) {
-                /* Iterate through the decoded line binary values, and if it's not null, change it to base32 and */
-                /* print to file */
-                if (linePointer->binaryValue[i] != NULL) {
-                    binary = decToBinary(ICCopy, 8);
-                    ICSpecialB32 = binToSpecialB32(binary);
-                    lineSpecialB32 = binToSpecialB32(linePointer->binaryValue[i]);
-                    fprintf(file_writer_pointer, "%s %s\n", ICSpecialB32, lineSpecialB32);
-                    free(binary);
-                    free(lineSpecialB32);
-                    free(ICSpecialB32);
-                    ICCopy++;
-                    linesCount++;
+        /* Printing instructions first, then the data declarations */
+        for (isData = 0; isData < 2; isData++) {
+            linePointer = decodedLineHead;
+            /* Getting the first valuable DecodedLine object */
+            while (linePointer != NULL && linePointer->isEmpty == 1)
+                linePointer = linePointer->next;
+
+            while (linePointer != NULL) {
+                int linesCount = 0, i = 0;
+                if (linePointer->isData == isData) {
+                    ICCopy = linePointer->value;
+                    while (linesCount < linePointer->length) {
+                        /* Iterate through the decoded line binary values, and if it's not null, change it to base32 and */
+                        /* print to file */
+                        if (linePointer->binaryValue[i] != NULL) {
+                            binary = decToBinary(ICCopy, 8);
+                            ICSpecialB32 = binToSpecialB32(binary);
+                            lineSpecialB32 = binToSpecialB32(linePointer->binaryValue[i]);
+                            fprintf(file_writer_pointer, "%s %s\n", ICSpecialB32, lineSpecialB32);
+                            free(binary);
+                            free(lineSpecialB32);
+                            free(ICSpecialB32);
+                            ICCopy++;
+                            linesCount++;
+                        }
+                        i++;
+                    }
                 }
-                i++;
+                linePointer = linePointer->next;
             }
-            linePointer = linePointer->next;
         }
 
         fclose(file_writer_pointer);

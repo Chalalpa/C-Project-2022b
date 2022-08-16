@@ -1,6 +1,11 @@
+Compiling file examples/errors/symbol_defined_twice
 ==============Reading Macros===============
 ==============Writing Macros===============
 ==============First Iteration===============
 Ignoring comment line number 1: ; dfsdf sdr4545
 
 Error! Label with this name was already initialized earlier in the file, err line 7: MAIN: hlt
+
+Ignoring empty line number 12: 		
+
+Failed in First Iteration phase!
